@@ -1,6 +1,4 @@
 /build/
-/lib/
-/runner/
 
 # Generated output
 timeloop-output.pkl
