@@ -18,10 +18,9 @@
   - [قابلیت ۸: مدل‌سازی شتاب‌دهنده‌های اسپارس (Sparseloop: Zero-Skipping & Gating)](#قابلیت-۸-مدلسازی-شتابدهندههای-اسپارس-sparseloop-zero-skipping--gating)
   - [قابلیت ۹: مدل‌سازی شتاب‌دهنده‌های لایه‌-فیوز شده (LoopTree: Fused Layers & Tree Mapping)](#قابلیت-۹-مدلسازی-شتابدهندههای-لایه‌-فیوز-شده-looptree-fused-layers--tree-mapping)
   - [قابلیت ۱۰: مدل‌سازی شبکه ارتباطی درون‌تراشه‌ای و چندپخشی (NoC & Multicast)](#قابلیت-۱۰-مدلسازی-شبکه-ارتباطی-درونتراشهای-و-چندپخشی-noc--multicast)
-- [۴. پروژه‌های نمونه عملی و اسکریپت‌های تست‌شده](#۴-پروژههای-نمونه-عملی-و-اسکریپتهای-تستشده)
-  - [پروژه ۱: کاوش DSE با ثبت لاگ کامل و تولید نمودارهای تحلیلی (`examples/dse_and_power/`)](#پروژه-۱-کاوش-dse-با-ثبت-لاگ-کامل-و-تولید-نمودارهای-تحلیلی-examplesdse_and_power)
-  - [پروژه ۲: شبیه‌سازی لایه‌های ادغام‌شده با درخت حلقه‌ها (`examples/looptree_fused/`)](#پروژه-۲-شبیهسازی-لایه‌های-ادغامشده-با-درخت-حلقه‌ها-exampleslooptree_fused)
-  - [پروژه ۳: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP (`examples/mma_gemm_accelerator/`)](#پروژه-۳-شبیه‌سازی-شتاب‌دهنده-سخت‌افزاری-واقعی-mma-و-مدل-riskmlp-examplesmma_gemm_accelerator)
+- [۴. پروژه‌های نمونه عملی و اسکریپت‌های تست‌شده](#۴-پروژه‌های-نمونه-عملی-و-اسکریپت‌های-تست‌شده)
+  - [پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`inputs/projects/mma_gemm_accelerator/`)](#پروژه-۱-شبیه‌سازی-شتاب‌دهنده-سخت‌افزاری-واقعی-mma-و-مدل-riskmlp-به-همراه-dse-inputsprojectsmma_gemm_accelerator)
+  - [پروژه ۲: شبیه‌سازی لایه‌های ادغام‌شده با درخت حلقه‌ها در LoopTree (`inputs/configs/looptree/`)](#پروژه-۲-شبیه‌سازی-لایه‌های-ادغام‌شده-با-درخت-حلقه‌ها-در-looptree-inputsconfigslooptree)
 - [۵. راهنمای راه‌اندازی و استفاده بر اساس نقش (شاخه‌های `user` و `master`)](#۵-راهنمای-راهاندازی-و-استفاده-بر-اساس-نقش-شاخههای-user-و-master)
   - [۵.۱. راهنمای شاخه `user` (کاربر نهایی - آماده اجرا بدون نیاز به کامپایل)](#۵۱-راهنمای-شاخه-user-کاربر-نهایی---آماده-اجرا-بدون-نیاز-به-کامپایل)
   - [۵.۲. راهنمای شاخه `master` (توسعه‌دهنده معماری / سورس‌کد کامل LoopTree)](#۵۲-راهنمای-شاخه-master-توسعهدهنده-معماری--سورسکد-کامل-looptree)
@@ -151,7 +150,7 @@ mapper:
 ```
 
 #### اسکریپت استخراج لاگ‌ها و تولید نمودارها:
-اسکریپت تخصصی [plot_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/dse_and_power/plot_dse.py) تمام لاگ‌ها را پارس کرده و فایل‌های زیر را تولید می‌کند:
+اسکریپت تخصصی [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator/plot_mma_dse.py) تمام لاگ‌ها را پارس کرده و فایل‌های تحلیلی، جبهه پارتو و نمودارهای جامع تفکیک توان را تولید می‌کند.
 1. `all_evaluated_candidates.csv`: ثبت مشخصات تمام نگاشت‌های موفق در طول سرچ (بهره‌وری، انرژی، ساختار حلقه).
 2. `dse_comprehensive_report.png`: نمودار ۴ قسمتی شامل جبهه پارتو، تفکیک توان، تریدآف بافر و TOPS/W.
 3. `search_space_all_candidates.png`: نمودار پراکندگی (Scatter Plot) کل فضای سرچ.
@@ -275,7 +274,7 @@ timeloop-design-space arch_sweep.yaml problem.yaml
 ```
 
 #### روش ۲: اتوماسیون پایتونی جامع
-اسکریپت [dse_and_power_sweep.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/dse_and_power/dse_and_power_sweep.py) پارامترها را در فایل کانفیگ تغییر داده، ماپر را اجرا کرده، فایل XML را پارس می‌کند و جداول مقایسه‌ای را تولید می‌نماید.
+اسکریپت [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator/run_mma_dse.py) پارامترها را در فایل کانفیگ تغییر داده، ماپر را اجرا کرده، فایل XML را پارس می‌کند و جداول مقایسه‌ای و نمودارها را تولید می‌نماید.
 
 ---
 
@@ -370,49 +369,9 @@ LoopTree محاسبه می‌کند که آیا نگه‌داری داده‌ه�
 
 ## ۴. پروژه‌های نمونه عملی و اسکریپت‌های تست‌شده
 
-در این مخزن، دو پروژه نمونه کامل و تست‌شده برای استفاده مستقیم آماده شده است:
+در این مخزن، پروژه‌های عملی و پیکربندی‌های آزموده‌شده برای استفاده مستقیم آماده شده است:
 
-### پروژه ۱: کاوش DSE با ثبت لاگ کامل و تولید نمودارهای تحلیلی (`examples/dse_and_power/`)
-
-این پروژه شامل فایل‌های زیر است:
-* [base_config.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/dse_and_power/base_config.yaml): پیکربندی شتاب‌دهنده ۲۵۶ هسته‌ای با لایه کانوولوشن استاندارد و فعال‌سازی `log-suboptimal`.
-* [dse_and_power_sweep.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/dse_and_power/dse_and_power_sweep.py): اسکریپت اجرای DSE روی اندازه‌های مختلف بافر سراسری (۳۲، ۶۴، ۱۲۸ و ۲۵۶ کیلوبایت).
-* [plot_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/dse_and_power/plot_dse.py): استخراج لاگ تمام نگاشت‌های کاندیدا و رسم ۴ نمودار تحلیلی.
-
-#### دستور اجرای گام‌به‌گام:
-```bash
-cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo
-source env/setup-env.bash
-cd examples/dse_and_power
-
-# ۱. اجرای جاروب DSE و تولید خروجی‌ها
-python3 dse_and_power_sweep.py
-
-# ۲. استخراج لاگ تمام کاندیداها و تولید نمودارها
-python3 plot_dse.py
-```
-
-#### نمودارهای تولیدشده:
-* `dse_plots/dse_comprehensive_report.png`: شامل جبهه پارتو (Pareto Frontier)، تفکیک توان مصرفی در قطعات سخت‌افزار، تریدآف اندازه بافر در برابر توان DRAM، و بازدهی TOPS/W.
-* `dse_plots/search_space_all_candidates.png`: نمودار پراکندگی کل کاندیداهای بررسی‌شده در فضای سرچ (انرژی در برابر بهره‌وری).
-* `dse_plots/all_evaluated_candidates.csv`: دیتاست متنی تمام نگاشت‌های موفق کشف‌شده در طول سرچ.
-
----
-
-### پروژه ۲: شبیه‌سازی لایه‌های ادغام‌شده با درخت حلقه‌ها (`examples/looptree_fused/`)
-
-* [fused_layers.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/looptree_fused/fused_layers.yaml): توصیف گراف بارهای کاری دو لایه متوالی، بافر بین‌لایه‌ای روی تراشه، و درخت نگاشت `type: fused`.
-* [fused_dse_and_power.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/looptree_fused/fused_dse_and_power.py): مقایسه عددی استراتژی‌های Unfused، ادغام کامل، Tiled Fusion، و Recompute.
-
-#### دستور اجرا:
-```bash
-cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo
-python3 examples/looptree_fused/fused_dse_and_power.py
-```
-
----
-
-### پروژه ۳: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP (`examples/mma_gemm_accelerator/`)
+### پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`inputs/projects/mma_gemm_accelerator/`)
 
 این پروژه مدلسازی دقیق سخت‌افزار واقعی شتاب‌دهنده ماتریسی پروژه بر اساس کد RTL واقعی ([nvdla_matrix_multiplication_4x4.v](file:///D:/UT.CE/MCI/GEMM-accelerator/HW/acc/nvdla_matrix_multiplication_4x4.v) و [matrix_multiplication_accelerator.v](file:///D:/UT.CE/MCI/GEMM-accelerator/HW/mma/matrix_multiplication_accelerator.v)) است:
 
@@ -421,21 +380,21 @@ python3 examples/looptree_fused/fused_dse_and_power.py
   * **رجیسترهای اکومولاتور (`acc_reg`)**: رجیستر ۳۲ بیتی جهت انباشت بدون سرریز ضرب‌های جزئی در جریان داده Output Stationary.
   * **بافرهای پینگ‌پنگ**: بافر ورودی اشتراکی (`IA_BUF`) با برودکست به تمام ستون‌ها، بافر محلی وزن‌ها (`W_BUF`)، بافر محلی خروجی (`OA_BUF`).
   * **ارتباط با حافظه اصلی**: اتصال از طریق Dedicated DMA و گذرگاه اشتراکی ۶۴ بیتی به DRAM.
-  * **تکنولوژی ساخت**: کتابخانه متن‌باز **45nm Nangate Open Cell** مستقر در [repo/TechFile/45nm/](file:///d:/UT.CE/NNA/04-TimeLoop/repo/TechFile/45nm).
+  * **تکنولوژی ساخت**: کتابخانه متن‌باز **45nm Nangate Open Cell** مستقر در [inputs/TechFile/45nm/](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/TechFile/45nm).
 * **بار کاری واقعی**: ۳ لایه مدل تخمین ریسک خودروهای خودران (**RiskMLP**):
   * لایه ۱: $M=1, K=16, N=64$
   * لایه ۲: $M=1, K=64, N=64$
   * لایه ۳: $M=1, K=64, N=3$
 * **فایل‌های پیاده‌سازی**:
-  * [arch_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/arch_mma.yaml): معماری سلسله‌مراتبی شتاب‌دهنده.
-  * [constraints_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/constraints_mma.yaml): قیود نگاشت مکانی و جریان داده Output Stationary.
-  * [problem_risk_mlp.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/problem_risk_mlp.yaml): ابعاد لایه‌های RiskMLP.
-  * [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/run_mma_dse.py): موتور DSE پارامتریک برای جاروب بلوک‌تری‌ها، سایز بافرها، فرکانس و لایه‌ها به همراه استخراج **تمام نقاط ساب‌اپتیمال**.
-  * [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/plot_mma_dse.py): رسم ۴ نمودار پیشرفته تحلیلی (پرتو، فضای جستجو، تفکیک توان، کارایی کل RiskMLP).
+  * [arch_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator/arch_mma.yaml): معماری سلسله‌مراتبی شتاب‌دهنده.
+  * [constraints_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator/constraints_mma.yaml): قیود نگاشت مکانی و جریان داده Output Stationary.
+  * [problem_risk_mlp.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator/problem_risk_mlp.yaml): ابعاد لایه‌های RiskMLP.
+  * [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator/run_mma_dse.py): موتور DSE پارامتریک برای جاروب بلوک‌تری‌ها، سایز بافرها، فرکانس و لایه‌ها به همراه استخراج **تمام نقاط ساب‌اپتیمال**.
+  * [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator/plot_mma_dse.py): رسم ۴ نمودار پیشرفته تحلیلی (پرتو، فضای جستجو، تفکیک توان، کارایی کل RiskMLP).
 
 #### دستورات اجرا:
 ```bash
-cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator
+cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo/inputs/projects/mma_gemm_accelerator
 
 # ۱. اجرای کامل کاوش فضای طراحی (۶۰ سناریو + ۲۰,۰۸۵ نقطه ساب‌اپتیمال)
 python3 run_mma_dse.py --bts 2 4 8 16 32 --bufs 128 256 512 1024 --freq 500.0
@@ -443,6 +402,21 @@ python3 run_mma_dse.py --bts 2 4 8 16 32 --bufs 128 256 512 1024 --freq 500.0
 # ۲. رسم تمام نمودارها
 python3 plot_mma_dse.py
 ```
+
+---
+
+### پروژه ۲: شبیه‌سازی لایه‌های ادغام‌شده با درخت حلقه‌ها در LoopTree (`inputs/configs/looptree/`)
+
+در این پیکربندی، جریان داده فیوزشده چند لایه بدون نوشتن نتایج میانی در حافظه DRAM شبیه‌سازی می‌شود:
+* [inputs/configs/looptree/sample.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/configs/looptree/sample.yaml): پیکربندی درخت حلقه‌ها و نگاشت فیوزشده چند لایه کانوولوشن و ماتریس.
+
+#### دستور اجرا:
+```bash
+cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo
+source env/setup-env.bash
+looptree-model inputs/configs/looptree/sample.yaml
+```
+خروجی‌ها شامل گزارش عملکرد، انرژی دسترسی و تحلیل ساختار چندوجهی در پوشه `outputs/` ذخیره می‌شوند.
 
 ---
 
