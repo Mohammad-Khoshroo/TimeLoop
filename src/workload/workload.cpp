@@ -77,8 +77,8 @@ std::string ShapeFileName(const std::string shape_name)
   {
     timeloopdir = BUILD_BASE_DIR;
   }
-  shape_dir_list.push_back(std::string(timeloopdir) + "/input");
   shape_dir_list.push_back(std::string(timeloopdir) + "/inputs");
+  shape_dir_list.push_back(std::string(timeloopdir) + "/input");
   shape_dir_list.push_back(std::string(timeloopdir) + "/problem-shapes");
 
   // Append ".cfg" extension if not provided.
