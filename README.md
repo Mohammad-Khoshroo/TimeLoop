@@ -31,17 +31,17 @@ This adds `runner/` to your `PATH` and sets `LD_LIBRARY_PATH` to `lib/`.
 
 #### Evaluate a Fixed Mapping
 ```bash
-timeloop-model input/sample_model.cfg
+timeloop-model inputs/sample_model.cfg
 ```
 
 #### Explore and Find Optimal Mapping
 ```bash
-timeloop-mapper input/sample_mapper.yaml
+timeloop-mapper inputs/sample_mapper.yaml
 ```
 
 #### Explore with Accelergy Energy Modeling
 ```bash
-timeloop-mapper input/sample_accelergy.yaml
+timeloop-mapper inputs/sample_accelergy.yaml
 ```
 
 All simulation outputs (`*.stats.txt`, `*.map.txt`, `*.map+stats.xml`) will automatically be generated in the **`outputs/`** directory.
@@ -59,7 +59,7 @@ All simulation outputs (`*.stats.txt`, `*.map.txt`, `*.map+stats.xml`) will auto
   - `timeloop-simple-mapper`: Lightweight mapper utility.
   - `einsumgraph`: Einsum graph generator and parser.
 * **`lib/`**: Precompiled dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
-* **`input/`**: Unified repository for all YAML specifications and configurations:
+* **`inputs/`**: Unified repository for all YAML specifications and configurations:
   - `sample_model.cfg`: Model evaluation configuration.
   - `sample_mapper.yaml`: Mapping exploration configuration.
   - `sample_accelergy.yaml`: Accelergy integration configuration.

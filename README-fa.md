@@ -29,17 +29,17 @@ source env/setup-env.bash
 
 #### ارزیابی مستقیم عملکرد و انرژی یک نگاشت مشخص:
 ```bash
-timeloop-model input/sample_model.cfg
+timeloop-model inputs/sample_model.cfg
 ```
 
 #### کاوش خودکار فضای نگاشت برای یافتن بهترین تایلینگ:
 ```bash
-timeloop-mapper input/sample_mapper.yaml
+timeloop-mapper inputs/sample_mapper.yaml
 ```
 
 #### کاوش خودکار فضای نگاشت متصل به Accelergy:
 ```bash
-timeloop-mapper input/sample_accelergy.yaml
+timeloop-mapper inputs/sample_accelergy.yaml
 ```
 
 > **نکته:** تمامی خروجی‌های شبیه‌سازی (`*.stats.txt`، `*.map.txt`، `*.map+stats.xml`) به صورت خودکار و بدون نیاز به فلگ اضافی درون پوشه **`outputs/`** ذخیره می‌شوند.
@@ -57,11 +57,11 @@ timeloop-mapper input/sample_accelergy.yaml
   * `timeloop-simple-mapper`: نسخه سبک ماپر
   * `einsumgraph`: ابزار تحلیل گراف اینسام
 * **`lib/`**: کتابخانه‌های اشتراکی کامپایل‌شده (`libtimeloop-model.so`, `libtimeloop-mapper.so`)
-* **`input/`**: کلیه فایل‌های ورودی و پیکربندی:
-  * فایل‌های نمونه ماپر و مدل: `input/sample_model.cfg`، `input/sample_mapper.yaml`، `input/sample_accelergy.yaml`
-  * فرمولاسیون ریاضی و ابعاد تانسورها: `input/cnn_layer.yaml`، `input/gemm_ABZ.yaml`
-  * کتابخانه فناوری نیمه‌هادی: `input/TechFile/` (Nangate 45nm)
-  * شتاب‌دهنده سخت‌افزاری MMA و DSE: `input/mma_gemm_accelerator/`
+* **`inputs/`**: کلیه فایل‌های ورودی و پیکربندی:
+  * فایل‌های نمونه ماپر و مدل: `inputs/sample_model.cfg`، `inputs/sample_mapper.yaml`، `inputs/sample_accelergy.yaml`
+  * فرمولاسیون ریاضی و ابعاد تانسورها: `inputs/cnn_layer.yaml`، `inputs/gemm_ABZ.yaml`
+  * کتابخانه فناوری نیمه‌هادی: `inputs/TechFile/` (Nangate 45nm)
+  * شتاب‌دهنده سخت‌افزاری MMA و DSE: `inputs/mma_gemm_accelerator/`
 * **`outputs/`**: مقصد پیش‌فرض تمامی فایل‌های نتایج شبیه‌سازی
 * **`env/setup-env.bash`**: اسکریپت تنظیم خودکار مسیرها
 
