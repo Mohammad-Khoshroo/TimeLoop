@@ -1,26 +1,65 @@
-# Timeloop
+# Timeloop / LoopTree
+
+[**📖 مطالعه دانشنامه و مستندات فارسی (README-fa.md)**](README-fa.md) | [**🤖 Agent & Architecture Guide (AGENTS.md)**](AGENTS.md)
 
 ## About
+Timeloop is an analytical modeling and mapping framework for deep learning and tensor algebra accelerators.
+This repository is updated to the latest stable **LoopTree (Timeloop v3.0)** architecture with fused-layer evaluation and Accelergy integration.
 
-Timeloop is an infrastructure that aims to provide modeling, mapping and code-generation for dense- and sparse- tensor algebra workloads on a range of accelerator architectures. It is built from two modular components:
+## Repository Branches
 
-* A fast analytical model that can emulate a range of architecture designs and provide performance and energy projections
-* A mapper that that searches for an optimal mapping in the space of mappings of a tensor-algebra problem on a given architecture
+1. **`master` (Developer Branch):**
+   - Contains full C++ source code, SCons build system, and LoopTree model engines.
+   - For researchers and developers extending Timeloop or compiling from source.
+2. **`user` (End-User Distribution Branch):**
+   - Lightweight, standalone distribution with precompiled binaries in `runner/`.
+   - **No C++ compiler or build steps needed.** Clone and run directly:
+     ```bash
+     git clone -b user https://github.com/Mohammad-Khoshroo/timeloop.git timeloop-user
+     cd timeloop-user
+     source env/setup-env.bash
+     timeloop-model inputs/configs/model/sample.yaml
+     ```
 
-## Documentation
+## Directory Structure
+* **`runner/`**: Clean distribution of compiled binaries (`looptree-model`, `timeloop-mapper`, `timeloop-model`, etc.).
+* **`inputs/`**: Unified repository for all YAML architecture specs, constraints, and problem definitions:
+  - `inputs/configs/`: Architecture and mapper configurations.
+  - `inputs/problem-shapes/`: Tensor problem definitions (CNN, GEMM).
+  - `inputs/TechFile/`: Technology characterization libraries (e.g. 45nm).
+* **`outputs/`**: All simulation statistics, maps, logs, and XML dumps are automatically routed into this folder.
+* **`src/` & `include/`**: C++ core simulation engine and applications (`master` branch).
+* **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`).
 
-Timeloop documentation is hosted at https://timeloop.csail.mit.edu/. The guides there cover installation, usage and examples.
-For a deeper understanding of Timeloop's internals please read our [ISPASS 2019 paper](https://parashar.org/ispass19.pdf).
+## Developer Build Instructions (`master` branch)
 
-Timeloop version 2.0 (a.k.a. Sparseloop) provides stochastic modeling of compressed-sparse tensor algebra. This work is described in our [MICRO 2022 paper](https://www.computer.org/csdl/proceedings-article/micro/2022/627200b377/1HMSE23T13a).
+### 1. Prerequisites
+```bash
+sudo apt update && sudo apt install -y \
+    scons build-essential libboost-all-dev libyaml-cpp-dev \
+    libconfig++-dev libncurses-dev libtinfo-dev libgpm-dev \
+    libgmp-dev libtool autoconf automake
+```
 
-Timeloop version 3.0 (a.k.a. Ruby) adds support for imperfectly-factorized mappings (described in our [ISPASS 2022 paper](https://ieeexplore.ieee.org/document/9804679)), in addition to support for spatial skews and flattened mappings.
+### 2. Polyhedral Libraries (NTL & Barvinok 0.41.6)
+```bash
+# NTL
+cd /tmp && wget https://libntl.org/ntl-11.5.1.tar.gz && tar -xzf ntl-11.5.1.tar.gz && cd ntl-11.5.1/src
+./configure NTL_GMP_LIP=on SHARED=on && make -j$(nproc) && sudo make install
 
-## Tutorial
+# Barvinok
+cd /tmp && wget https://barvinok.sourceforge.io/barvinok-0.41.6.tar.gz && tar -xzf barvinok-0.41.6.tar.gz && cd barvinok-0.41.6
+./configure --enable-shared-barvinok --with-ntl=system && make -j$(nproc) && sudo make install && sudo ldconfig
+```
 
-New users are strongly encouraged to complete the Timeloop [tutorial](https://accelergy.mit.edu/tutorial.html). Serially walking through the [exercises](https://github.com/Accelergy-Project/timeloop-accelergy-exercises/) from the tutorial serves as an essential hands-on introduction to the tool.
+### 3. Accelergy Energy Model
+```bash
+pip install --break-system-packages accelergy accelergy-cacti-plug-in accelergy-table-based-plug-in
+```
 
-## Dependencies
-
-Timeloop depends on the isl and barvinok libraries. In particular, barvinok version 0.41.6 (along with the pre-packaged isl library) has been tested to
-build successfully with this version of Timeloop. Instructions for installing barvinok can be found in the [this link](https://barvinok.sourceforge.io/).
+### 4. Build with SCons
+```bash
+source env/setup-env.bash
+scons -j$(nproc) --accelergy
+```
+*Binaries will automatically install into `runner/` and the temporary `build/` directory is automatically cleaned upon success.*

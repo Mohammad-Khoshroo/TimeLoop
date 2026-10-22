@@ -67,7 +67,7 @@ int main(int argc, char* argv[])
   sigaction(SIGINT, &action, NULL);
 
   std::vector<std::string> input_files;
-  std::string output_dir = ".";
+  std::string output_dir = "outputs";
   bool success = ParseArgs(argc, argv, input_files, output_dir);
   if (!success)
   {

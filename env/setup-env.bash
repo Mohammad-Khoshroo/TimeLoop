@@ -27,8 +27,7 @@
 # This should be sourced.
 export TIMELOOP_BASE_PATH=$(cd "$(dirname "${BASH_SOURCE[0]:-${(%):-%x}}")/.."; pwd)
 
-# We should separate the following depending on which OS is running.
-# We should also create separate scripts for bash and zsh. At the moment this
-# script works with both shells.
 export LD_LIBRARY_PATH=$TIMELOOP_BASE_PATH/lib:$LD_LIBRARY_PATH
 export DYLD_FALLBACK_LIBRARY_PATH=$TIMELOOP_BASE_PATH/lib:$DYLD_FALLBACK_LIBRARY_PATH
+export PATH=$TIMELOOP_BASE_PATH/runner:$PATH
+export TIMELOOP_PROBLEM_SHAPE_DIR=$TIMELOOP_BASE_PATH/inputs/problem-shapes

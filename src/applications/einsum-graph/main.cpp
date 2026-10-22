@@ -12,7 +12,7 @@
 int main(int argc, char* argv[])
 {
   std::vector<std::string> input_files;
-  std::string output_dir = ".";
+  std::string output_dir = "outputs";
   bool success = ParseArgs(argc, argv, input_files, output_dir);
   if (!success)
   {
@@ -27,6 +27,6 @@ int main(int argc, char* argv[])
 
   auto einsum_graph = EinsumGraph(workload);
 
-  std::ofstream fout("out.dot");
+  std::ofstream fout(output_dir + "/out.dot");
   WriteGraphviz(fout, einsum_graph);
 }
