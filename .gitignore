@@ -1,0 +1,24 @@
+# Development & source directories (not tracked on user branch)
+src/
+include/
+build/
+tenssella/
+tests/
+orojenesis/
+orojenesis-v2-wip/
+.vscode/
+.devcontainer/
+.sconsign.dblite
+*.log
+
+# Ignore simulation outputs except gitkeep
+outputs/*
+!outputs/.gitkeep
+
+# VRDocs engine directory
+.vrdocs/
+
+# Compiled Python files
+__pycache__/
+*.py[cod]
+.DS_Store
