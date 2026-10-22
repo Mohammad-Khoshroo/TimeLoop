@@ -23,22 +23,24 @@ This repository is maintained across two dedicated branches:
      git clone -b user https://github.com/Mohammad-Khoshroo/TimeLoop.git timeloop-user
      cd timeloop-user
      source env/setup-env.bash
-     timeloop-model inputs/configs/model/sample.cfg
+     timeloop-model input/sample_model.cfg
      ```
 
 ---
 
 ## Directory Structure
 
-* **`runner/`**: Consolidated directory containing precompiled simulation executables (`looptree-model`, `timeloop-mapper`, `timeloop-model`, `timeloop-metrics`, `timeloop-design-space`, `timeloop-simple-mapper`).
-* **`inputs/`**: Unified repository for all YAML specifications:
-  - `inputs/configs/`: Accelerator architecture specifications, mapping constraints, and mapper search settings.
-  - `inputs/problem-shapes/`: Tensor mathematical formulations (CNN layers, GEMM).
-  - `inputs/TechFile/`: Semiconductor technology characterization files (Nangate 45nm LEF/Liberty).
-  - `inputs/projects/`: Concrete accelerator design projects (e.g., MMA GEMM accelerator and DSE suite).
+* **`runner/`**: Consolidated directory containing precompiled simulation executables (`looptree-model`, `timeloop-mapper`, `timeloop-model`, `timeloop-metrics`, `timeloop-design-space`, `timeloop-simple-mapper`, `einsumgraph`).
+* **`input/`**: Unified repository for all YAML specifications and configurations:
+  - `sample_model.cfg`: Sample architecture and mapping specification for deterministic evaluation.
+  - `sample_mapper.yaml`: Comprehensive architecture, mapping constraints, and mapper search settings.
+  - `sample_accelergy.yaml`: Accelergy integration configuration for accurate energy modeling.
+  - `cnn_layer.yaml`, `gemm_ABZ.yaml`: Tensor problem definitions.
+  - `TechFile/`: Semiconductor technology characterization files (Nangate 45nm LEF/Liberty).
+  - `mma_gemm_accelerator/`: Concrete accelerator design project and DSE suite.
 * **`outputs/`**: All simulation results, performance counters, mappings, XML dumps, and execution logs are automatically directed to this directory.
 * **`src/` & `include/`**: C++ analytical simulation engine, polyhedral analysis pipeline, and application entry points (`master` branch).
-* **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`).
+* **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
 
 ---
 
@@ -102,19 +104,19 @@ Upon a successful build:
 ### Single-Layer Evaluation (`timeloop-model`)
 ```bash
 source env/setup-env.bash
-timeloop-model inputs/configs/model/sample.cfg
+timeloop-model input/sample_model.cfg
 ```
 
 ### Mapping Exploration (`timeloop-mapper`)
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/configs/mapper/sample.cfg
+timeloop-mapper input/sample_mapper.yaml
 ```
 
-### Fused-Layer LoopTree Evaluation (`looptree-model`)
+### Accelergy-Enabled Exploration (`timeloop-mapper` with Accelergy)
 ```bash
 source env/setup-env.bash
-looptree-model inputs/configs/looptree/sample.yaml
+timeloop-mapper input/sample_accelergy.yaml
 ```
 
 All generated summary tables (`*.stats.txt`), optimal tile mappings (`*.map.txt`), and structured logs (`*.map+stats.xml`) will be stored directly inside `outputs/`.
