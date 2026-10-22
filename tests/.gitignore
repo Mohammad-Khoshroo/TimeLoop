@@ -1,7 +1,0 @@
-simba_chip
-c++_to_python
-*.o
-conv_problems.h
-conv_problems.py
-timeloop-mapper.*
-
