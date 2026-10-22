@@ -1,0 +1,107 @@
+mapper:
+  algorithm: linear-pruned
+  optimization-metrics:
+    - energy
+    - delay
+  search-size: 200
+  victory-condition: 50
+  timeout: 50
+  live-status: false
+  log-suboptimal: true
+  log-stats: true
+  diagnostics: true
+
+arch:
+  arithmetic:
+    name: MACs
+    instances: 16
+    meshX: 4
+    word-bits: 8
+
+  storage:
+    - name: acc_reg
+      entries: 1
+      instances: 4
+      meshX: 4
+      word-bits: 32
+
+    - name: OA_BUF
+      entries: 64
+      instances: 4
+      meshX: 4
+      word-bits: 32
+
+    - name: W_BUF
+      entries: 256
+      instances: 4
+      meshX: 4
+      word-bits: 8
+
+    - name: IA_BUF
+      entries: 256
+      instances: 1
+      word-bits: 8
+
+    - name: DRAM
+      technology: DRAM
+      instances: 1
+      word-bits: 8
+      block-size: 16
+      bandwidth: 8.0
+
+mapspace:
+  constraints:
+    - target: acc_reg
+      type: datatype
+      keep:
+        - Z
+      bypass:
+        - A
+        - B
+
+    - target: OA_BUF
+      type: datatype
+      keep:
+        - Z
+      bypass:
+        - A
+        - B
+
+    - target: W_BUF
+      type: datatype
+      keep:
+        - B
+      bypass:
+        - A
+        - Z
+
+    - target: IA_BUF
+      type: datatype
+      keep:
+        - A
+      bypass:
+        - B
+        - Z
+
+    - target: DRAM
+      type: datatype
+      keep:
+        - A
+        - B
+        - Z
+
+    - target: IA_BUF
+      type: spatial
+      factors: M1 N4 K1
+      permutation: MNK
+
+    - target: acc_reg
+      type: spatial
+      factors: M1 N1 K4
+      permutation: MNK
+
+problem:
+  shape: gemm-ABZ
+  M: 1
+  K: 16
+  N: 64
