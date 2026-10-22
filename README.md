@@ -23,7 +23,7 @@ This repository is maintained across two dedicated branches:
      git clone -b user https://github.com/Mohammad-Khoshroo/TimeLoop.git timeloop-user
      cd timeloop-user
      source env/setup-env.bash
-     timeloop-model inputs/samples/sample_model.cfg
+     timeloop-model inputs/sample_model_gemm.yaml
      ```
 
 ---
@@ -31,15 +31,25 @@ This repository is maintained across two dedicated branches:
 ## Directory Structure
 
 * **`runner/`**: Consolidated directory containing precompiled simulation executables (`looptree-model`, `timeloop-mapper`, `timeloop-model`, `timeloop-metrics`, `timeloop-design-space`, `timeloop-simple-mapper`, `einsumgraph`).
-* **`inputs/`**: Structured repository organized into clean functional categories:
-  - **`workloads/`**: Tensor problem definitions and mathematical formulations (`cnn_layer.yaml`, `gemm_ABZ.yaml`, `chen_asplos2014.yaml`, `eyeriss_256_split_problem.yaml`).
-  - **`architectures/`**: Hardware accelerator designs and component specifications (`eyeriss_256.yaml`, `eyeriss_1024.cfg`, `gemm.cfg`, `simba_chip.cfg`, etc.).
-  - **`samples/`**: Ready-to-run end-to-end evaluation and mapper exploration templates (`sample_model.cfg`, `sample_mapper.yaml`, `sample_accelergy.yaml`, `sample_mapper.cfg`, `mapperstats.cfg`).
-  - **`TechFile/`**: Semiconductor technology characterization files (Nangate 45nm LEF/Liberty).
-  - **`mma_gemm_accelerator/`**: Concrete custom accelerator design project and DSE suite.
+* **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
+* **`tech/`**: Semiconductor technology characterization libraries (Nangate 45nm LEF/Liberty/Verilog in `tech/45nm/`).
+* **`examples/`**: Reference archive of preconfigured accelerator architectures and workloads:
+  - **`gemm/`**: General Matrix Multiply accelerator architecture, constraints, workloads, and unified sample configurations.
+  - **`eyeriss/`**: Eyeriss 256/1024-PE spatial array specifications, split problem layers, and Accelergy configurations.
+  - **`cnn_conv/`**: 7D CNN convolution layers, ASPLOS 2014 benchmarks, and mapper/model templates.
+  - **`simba/`**: NVIDIA Simba multi-chiplet accelerator architecture specification.
+  - **`mma_gemm_accelerator/`**: Dedicated MMA hardware accelerator project, RiskMLP neural network layers, and automated DSE suite.
+* **`inputs/`**: Active simulation workspace directory (configured by default with the GEMM accelerator):
+  - `sample_gemm.yaml`: Consolidated single-file specification for instant mapping exploration.
+  - `sample_model_gemm.yaml`: Consolidated single-file specification for deterministic evaluation.
+  - `architectures/`: Modular hardware architecture definitions.
+  - `constraints/`: Modular spatial and temporal mapping constraints.
+  - `workloads/`: Tensor shape and problem dimension specifications.
+  - `mapper/`: Search heuristics and convergence criteria.
 * **`outputs/`**: All simulation results, performance counters, mappings, XML dumps, and execution logs are automatically directed to this directory.
 * **`src/`**: Unified C++ source tree containing both implementation (`.cpp`) and header (`.hpp`) files side-by-side (`master` branch).
-* **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
+
+> **Switching Active Architecture:** To evaluate any other accelerator model, copy its files from `examples/<model>/*` into `inputs/` (e.g. `cp -r examples/eyeriss/* inputs/`).
 
 ---
 
@@ -100,22 +110,38 @@ Upon a successful build:
 
 ## Running Simulations
 
-### Single-Layer Evaluation (`timeloop-model`)
+### Deterministic Architecture Evaluation (`timeloop-model`)
 ```bash
 source env/setup-env.bash
-timeloop-model inputs/samples/sample_model.cfg
+timeloop-model inputs/sample_model_gemm.yaml
 ```
 
-### Mapping Exploration (`timeloop-mapper`)
+### Optimal Mapping Exploration (`timeloop-mapper`)
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/samples/sample_mapper.yaml
+timeloop-mapper inputs/sample_gemm.yaml
 ```
 
-### Accelergy-Enabled Exploration (`timeloop-mapper` with Accelergy)
+### Modular Multi-File Exploration
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/samples/sample_accelergy.yaml
+timeloop-mapper \
+    inputs/architectures/gemm_arch.yaml \
+    inputs/constraints/gemm_constraints.yaml \
+    inputs/workloads/gemm_problem.yaml \
+    inputs/mapper/gemm_mapper.yaml
+```
+
+### Running Archived Examples
+You can also run models directly from the `examples/` directory:
+```bash
+# CNN 7D Convolution exploration
+timeloop-mapper examples/cnn_conv/samples/sample_mapper.yaml
+
+# Accelerated MMA GEMM DSE suite
+cd examples/mma_gemm_accelerator
+python3 run_mma_dse.py
+python3 plot_mma_dse.py
 ```
 
 All generated summary tables (`*.stats.txt`), optimal tile mappings (`*.map.txt`), and structured logs (`*.map+stats.xml`) will be stored directly inside `outputs/`.

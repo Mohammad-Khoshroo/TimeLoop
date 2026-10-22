@@ -18,7 +18,9 @@ from pathlib import Path
 # تنظیم مسیرها
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_DIR = SCRIPT_DIR.parent.parent
-TECH_DIR = REPO_DIR / "TechFile" / "45nm"
+TECH_DIR = REPO_DIR / "tech" / "45nm"
+if not TECH_DIR.exists():
+    TECH_DIR = REPO_DIR / "TechFile" / "45nm"
 RESULTS_DIR = SCRIPT_DIR / "results"
 
 # لایه‌های مدل RiskMLP (از generate_risk_mlp_fused.py)
