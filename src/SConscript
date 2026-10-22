@@ -30,7 +30,7 @@ import os
 Import('env')
 
 env.Append(CPPDEFINES = [('BUILD_BASE_DIR', '\\"' + env["BUILD_BASE_DIR"] + '\\"')])
-env.Append(CPPPATH = [os.path.join(env['BUILD_BASE_DIR'], 'include')])
+env.Append(CPPPATH = [os.path.join(env['BUILD_BASE_DIR'], 'src'), 'src'])
 #env.Append(CPPPATH = ['src/include'])
 #env["CPPPATH"] = ["."]
 
