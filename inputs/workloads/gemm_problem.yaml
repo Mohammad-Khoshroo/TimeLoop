@@ -1,0 +1,5 @@
+problem:
+  shape: gemm-ABZ
+  M: 1
+  K: 16
+  N: 64

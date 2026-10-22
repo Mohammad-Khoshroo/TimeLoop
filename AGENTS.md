@@ -24,16 +24,24 @@
 timeloop/
 ├── runner/                 # باینری‌های اجرایی نهایی (جایگزین bin)
 ├── lib/                    # کتابخانه‌های اشتراکی پویا (.so)
-├── inputs/                 # تمامی ورودی‌های مدل‌سازی، معماری و بارهای کاری
-│   ├── workloads/          # تعاریف اشکال ریاضی تانسورها (Problem Shapes)
-│   ├── architectures/      # تعاریف معماری شتاب‌دهنده‌ها (Hardware Architecture Specs)
-│   ├── samples/            # نمونه‌های آماده ارزیابی و کاوش (Ready-to-run Templates)
-│   ├── TechFile/           # کتابخانه مشخصات تکنولوژی ۴۵ نانومتر Nangate
-│   └── mma_gemm_accelerator/ # پروژه کامل شتاب‌دهنده سخت‌افزاری MMA و DSE
+├── tech/                   # کتابخانه سلول استاندارد فناوری سیلیکون
+│   └── 45nm/               # کتابخانه Nangate 45nm LEF, LIB, Verilog
+├── examples/               # آرشیو جامع و ایزوله معماری‌ها و نمونه‌های شتاب‌دهنده
+│   ├── gemm/               # نمونه شتاب‌دهنده ضرب ماتریسی عمومی
+│   ├── eyeriss/            # نمونه شتاب‌دهنده آرایه مکانی آیریس
+│   ├── cnn_conv/           # لایه‌های کانولوشن ۷ بعدی و نمونه‌های مدل/ماپر
+│   ├── simba/              # معماری چندچیپلتی سیمبا
+│   └── mma_gemm_accelerator/ # پروژه شتاب‌دهنده MMA و DSE
+├── inputs/                 # پوشه فعال شبیه‌سازی (مبتنی بر معماری GEMM)
+│   ├── architectures/      # gemm_arch.yaml
+│   ├── workloads/          # gemm_ABZ.yaml, gemm_problem.yaml, gemm.cfg
+│   ├── constraints/        # gemm_constraints.yaml
+│   ├── mapper/             # gemm_mapper.yaml
+│   ├── sample_gemm.yaml    # فایل فعال آماده کاوش با timeloop-mapper
+│   └── sample_model_gemm.yaml # فایل فعال آماده ارزیابی با timeloop-model
 ├── outputs/                # مقصد پیش‌فرض و خودکار تمامی فایل‌های خروجی
 ├── env/                    # اسکریپت‌های تنظیم محیط شل (setup-env.bash)
-├── src/                    # سورس‌کد کامل موتور تحلیلی C++17 (شاخه master)
-├── include/                # هدرهای سراسری C++ (شاخه master)
+├── src/                    # سورس‌کد و هدرهای C++17 به صورت متناظر در کنار هم (cpp و hpp)
 ├── SConstruct              # اسکریپت سیستم ساخت SCons مجهز به هوک پاک‌سازی خودکار
 ├── README.md               # مستندات انگلیسی فنی (۱۰۰٪ بدون ایموجی)
 ├── README-fa.md            # مستندات جامع فارسی و دانشگاهی (بدون ایموجی)
@@ -57,30 +65,27 @@ timeloop/
 ### ۳.۲. پوشه کتابخانه‌های پویا (`lib/`)
 * شامل `libtimeloop-model.so` و `libtimeloop-mapper.so` که در زمان اجرا به `LD_LIBRARY_PATH` متصل می‌شوند.
 
-### ۳.۳. پوشه سازمان‌یافته ورودی‌ها (`inputs/`)
-این پوشه به ۵ بخش منظم تفکیک شده است تا هیچ فایل پراکنده‌ای در ریشه آن وجود نداشته باشد:
-1. **`inputs/workloads/`**:
-   - `cnn_layer.yaml`: تعریف ۷ بعدی استاندارد لایه‌های کانولوشن (P, Q, R, S, C, K, N).
-   - `gemm_ABZ.yaml`: تعریف تانسور ضرب ماتریسی عمومی استاندارد (M, N, K).
-   - `chen_asplos2014.yaml`: بنچمارک استاندارد بارهای کاری ASPLOS 2014.
-   - `eyeriss_256_split_problem.yaml`: تانسور لایه‌های تفکیک‌شده شتاب‌دهنده آیریس.
-2. **`inputs/architectures/`**:
-   - `eyeriss_256.yaml` و `eyeriss_256.cfg`: معماری ۲۵۶ واحد پردازشی شتاب‌دهنده آیریس در قالب‌های YAML و LibConfig.
-   - `eyeriss_1024.cfg`: معماری مقیاس‌یافته ۱۰۲۴ واحد پردازشی.
-   - `eyeriss_256_split_arg.yaml` و `eyeriss_256_split_accelergy_arg.yaml`: معماری‌های ماژولار متصل به شبیه‌ساز انرژی.
-   - `gemm.cfg`: معماری پایه ضرب ماتریسی.
-   - `simba_chip.cfg`: مشخصات معماری چندچیپلتی Simba انویدیا.
-3. **`inputs/samples/`**:
-   - `sample_model.cfg`: نمونه کامل اجرای ارزیاب مستقیم قطعی.
-   - `sample_mapper.yaml` و `sample_mapper.cfg`: نمونه جامع کاوشگر ماپر با الگوریتم‌های ژنتیک و هیوریستیک.
-   - `sample_accelergy.yaml`: نمونه اتصال مستقیم به ابزار Accelergy برای تخمین انرژی سطح استاندارد سل.
-   - `mapperstats.cfg`: فایل پیکربندی نحوه گزارش‌گیری و ذخیره‌سازی آمار ماپر.
-4. **`inputs/TechFile/`**:
-   - پوشه `45nm/` شامل فایل‌های کتابخانه باز سلول استاندارد FreePDK45/Nangate (`.lef`, `.lib`, `.v`).
-5. **`inputs/mma_gemm_accelerator/`**:
-   - پروژه مستقل ارزیابی سخت‌افزاری شتاب‌دهنده ضرب ماتریسی MMA به همراه مدل سه‌لایه‌ای RiskMLP، اسکریپت اجرای کاوش فضای طراحی (`run_mma_dse.py`) و تولید خودکار نمودارهای ۴ گانه پارتو و توان (`plot_mma_dse.py`).
+### ۳.۳. پوشه آرشیو نمونه‌ها (`examples/`) و کتابخانه (`tech/`)
+پوشه `examples/` آرشیو مرجع معماری‌های مختلف است که هر کدام در پوشه اختصاصی خود ایزوله شده‌اند:
+1. **`examples/gemm/`**: معماری، قیود نگاشت و ابعاد ماتریسی ضرب عمومی GEMM به همراه فایل‌های تجمیعی آماده اجرا.
+2. **`examples/eyeriss/`**: معماری‌های ۲۵۶ و ۱۰۲۴ واحدی آیریس، فایل‌های تفکیک‌شده و اتصال به انرژی.
+3. **`examples/cnn_conv/`**: اشکال ۷ بعدی لایه‌های کانولوشن و الگوهای ارزیابی و کاوش مدل و ماپر.
+4. **`examples/simba/`**: مشخصات معماری چندچیپلتی Simba انویدیا.
+5. **`examples/mma_gemm_accelerator/`**: پروژه کامل DSE شتاب‌دهنده سخت‌افزاری MMA و مدل RiskMLP به همراه اسکریپت‌های تحلیلی پایتون.
+6. **`tech/45nm/`**: کتابخانه متن‌باز Nangate 45nm شامل مشخصات LEF، Liberty و Verilog.
 
-### ۳.۴. پوشه نتایج شبیه‌سازی (`outputs/`)
+### ۳.۴. پوشه فعال ورودی‌ها (`inputs/`)
+پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و به صورت پیش‌فرض با معماری **GEMM** مقداردهی شده است:
+* `inputs/architectures/gemm_arch.yaml`: تعریف ساختار سلسله‌مراتبی حافظه و واحدهای محاسباتی.
+* `inputs/constraints/gemm_constraints.yaml`: قیود نگاشت مکانی و زمانی.
+* `inputs/workloads/`: تعاریف تانسور و ابعاد مسئله (`gemm_ABZ.yaml`, `gemm_problem.yaml`, `gemm.cfg`).
+* `inputs/mapper/gemm_mapper.yaml`: الگوریتم و شرایط خاتمه جستجو.
+* `inputs/sample_gemm.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
+* `inputs/sample_model_gemm.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
+
+> **تعویض معماری فعال:** برای ارزیابی هر معماری دیگر، کافیست محتوای پوشه مربوطه از `examples/` در پوشه `inputs/` کپی شود (مثلاً `cp -r examples/eyeriss/* inputs/`).
+
+### ۳.۵. پوشه نتایج شبیه‌سازی (`outputs/`)
 کلیه ابزارهای اجرایی C++ به گونه‌ای پیکربندی شده‌اند که تمام نتایج را مستقیماً و بدون نیاز به تعیین سوئیچ خط فرمان در پوشه **`outputs/`** تولید می‌کنند:
 * `*.stats.txt`: گزارش تفصیلی مساحت، توان ایستا/پویا، بهره‌وری محاسباتی و چرخه‌ها.
 * `*.map.txt`: بهترین نگاشت مکانی و زمانی حلقه‌ها.
@@ -92,11 +97,11 @@ timeloop/
 ## ۴. تفکیک شاخه‌ها در گیت‌هاب: `master` در برابر `user`
 
 1. **شاخه `master` (محیط توسعه و سورس کامل):**
-   - حاوی تمامی کدهای منبع C++17، فایل‌های هدر، سیستم ساخت SCons و تست‌های درونی.
+   - حاوی تمامی کدهای منبع C++17، فایل‌های هدر، باینری‌های رانر، سیستم ساخت SCons و تست‌های درونی.
    - ویژه مهندسان سخت‌افزار جهت افزودن ویژگی‌های جدید یا کامپایل مجدد.
 2. **شاخه `user` (توزیع سبک و آماده اجرا بدون نیاز به کامپایل):**
    - بدون حتی یک فایل سورس C++ و بدون نیاز به نصب SCons یا g++.
-   - صرفاً شامل باینری‌های پوشه `runner/`، کتابخانه‌های `lib/`، پوشه مرتب `inputs/` و فایل‌های راهنما.
+   - صرفاً شامل باینری‌های پوشه `runner/`، کتابخانه‌های `lib/`، پوشه مرتب `inputs/`، `examples/` و فایل‌های راهنما.
    - کاربر با دستور `git clone -b user https://github.com/Mohammad-Khoshroo/TimeLoop.git` در چند ثانیه پکیج آماده شبیه‌سازی را دریافت می‌کند.
 
 ---
@@ -111,29 +116,35 @@ source env/setup-env.bash
 ```
 این دستور پوشه `runner/` را به `PATH` اضافه کرده، `LD_LIBRARY_PATH` را به `lib/` متصل می‌کند و متغیرهای `TIMELOOP_PROBLEM_SHAPE_DIR` و `TIMELOOP_PROBLEM_SHAPE_DIRS` را به صورت خودکار روی `inputs/workloads` تنظیم می‌نماید.
 
-### ۵.۲. اجرای ارزیابی قطعی (Model)
+### ۵.۲. اجرای ارزیابی قطعی GEMM (Model)
 ```bash
-timeloop-model inputs/samples/sample_model.cfg
+timeloop-model inputs/sample_model_gemm.yaml
 ```
 
-### ۵.۳. اجرای کاوش خودکار نگاشت (Mapper)
+### ۵.۳. اجرای کاوش خودکار نگاشت GEMM (Mapper)
 ```bash
-timeloop-mapper inputs/samples/sample_mapper.yaml
+timeloop-mapper inputs/sample_gemm.yaml
 ```
 
-### ۵.۴. اجرای کاوش متصل به Accelergy
+### ۵.۴. اجرای ماژولار چندفایلی
 ```bash
-timeloop-mapper inputs/samples/sample_accelergy.yaml
+timeloop-mapper inputs/architectures/gemm_arch.yaml inputs/constraints/gemm_constraints.yaml inputs/workloads/gemm_problem.yaml inputs/mapper/gemm_mapper.yaml
 ```
 
 ### ۵.۵. اجرای پروژه شتاب‌دهنده MMA و DSE
 ```bash
-cd inputs/mma_gemm_accelerator
+cd examples/mma_gemm_accelerator
 python3 run_mma_dse.py
 python3 plot_mma_dse.py
 ```
 
-### ۵.۶. کامپایل مجدد سورس‌کد (فقط در شاخه `master`)
+### ۵.۶. ارزیابی نمونه‌های لایه‌های کانولوشن از پوشه examples
+```bash
+timeloop-model examples/cnn_conv/samples/sample_model.cfg
+timeloop-mapper examples/cnn_conv/samples/sample_mapper.yaml
+```
+
+### ۵.۷. کامپایل مجدد سورس‌کد (فقط در شاخه `master`)
 ```bash
 scons -j$(nproc) --accelergy
 ```

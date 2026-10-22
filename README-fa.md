@@ -57,30 +57,27 @@
   - فرآیند کامپایل فایل‌های میانی را در `build/` ایجاد می‌کند؛ با این حال در پیکربندی سیستم بیلد، هوک خودکار پس از اتمام موفقیت‌آمیز ساخت اجرا شده و پوشه `build/` را پاک‌سازی می‌کند تا مخزن همواره تمیز و کم‌حجم باقی بماند.
 * **کتابخانه‌های اشتراکی (`lib/`):** کتابخانه نهایی کامپایل‌شده `libtimeloop-model.so` در پوشه `lib/` نصب می‌شود و در زمان اجرا به `LD_LIBRARY_PATH` متصل است.
 
-### ۲.۲. پوشه ورودی‌ها (`inputs/`)
-کلیه فایل‌های ورودی، معماری‌ها، تعاریف مسئله و کتابخانه‌های فناوری به شکلی کاملاً منظم و ساختاریافته در پوشه‌های تخصصی درون **`inputs/`** دسته‌بندی شده‌اند:
-1. **پوشه اشکال و ابعاد تانسورها (`inputs/workloads/`):**
-   * `cnn_layer.yaml`: فرمولاسیون ریاضی ۷ بعدی استاندارد لایه‌های کانولوشن (P, Q, R, S, C, K, N).
-   * `gemm_ABZ.yaml`: فرمولاسیون ضرب ماتریسی عمومی (M, N, K).
-   * `chen_asplos2014.yaml`: بنچمارک استاندارد بارهای کاری ASPLOS 2014.
-   * `eyeriss_256_split_problem.yaml`: تعریف تانسور لایه‌های اختصاصی آیریس.
-2. **پوشه معماری‌های سخت‌افزاری (`inputs/architectures/`):**
-   * `eyeriss_256.yaml` و `eyeriss_256.cfg`: پیکربندی سخت‌افزاری ۲۵۶ واحد پردازشی آرایه آیریس.
-   * `eyeriss_1024.cfg`: پیکربندی مقیاس‌یافته ۱۰۲۴ واحد پردازشی.
-   * `eyeriss_256_split_arg.yaml` و `eyeriss_256_split_accelergy_arg.yaml`: پیکربندی تقسیم‌شده معماری برای اتصال به Accelergy.
-   * `gemm.cfg`: معماری پایه شتاب‌دهنده ماتریسی.
-   * `simba_chip.cfg`: معماری شتاب‌دهنده چندچیپلتی سیمبا (NVIDIA Simba).
-3. **پوشه نمونه‌های آماده اجرا (`inputs/samples/`):**
-   * `sample_model.cfg`: نمونه آماده ارزیابی قطعی معماری و نگاشت با `timeloop-model`.
-   * `sample_mapper.yaml` و `sample_mapper.cfg`: نمونه آماده کاوش و بهینه‌سازی خودکار تایلینگ با `timeloop-mapper`.
-   * `sample_accelergy.yaml`: نمونه کاوش ماپر متصل به ابزار Accelergy برای تخمین دقیق توان و انرژی.
-   * `mapperstats.cfg`: تنظیمات و دستورالعمل‌های ذخیره‌سازی داده‌های ماپر.
-4. **کتابخانه فناوری نیمه‌هادی (`inputs/TechFile/`):**
-   * کتابخانه سلول استاندارد متن‌باز Nangate 45nm شامل فایل‌های LEF و Liberty (`45nm/`).
-5. **پروژه شتاب‌دهنده سخت‌افزاری و DSE (`inputs/mma_gemm_accelerator/`):**
-   * شبیه‌سازی کامل شتاب‌دهنده ماتریسی MMA به همراه اسکریپت‌های DSE پارامتریک و رسم خودکار نمودارها.
+### ۲.۲. پوشه آرشیو نمونه‌ها (`examples/`) و کتابخانه (`tech/`)
+پوشه `examples/` آرشیو مرجع معماری‌های مختلف سخت‌افزاری است که هر کدام در پوشه اختصاصی خود ایزوله شده‌اند:
+1. **`examples/gemm/`**: معماری، قیود نگاشت و ابعاد ماتریسی ضرب عمومی GEMM به همراه فایل‌های تجمیعی آماده اجرا.
+2. **`examples/eyeriss/`**: معماری‌های ۲۵۶ و ۱۰۲۴ واحدی آیریس، فایل‌های تفکیک‌شده و اتصال به انرژی.
+3. **`examples/cnn_conv/`**: اشکال ۷ بعدی لایه‌های کانولوشن و الگوهای ارزیابی و کاوش مدل و ماپر.
+4. **`examples/simba/`**: مشخصات معماری چندچیپلتی Simba انویدیا.
+5. **`examples/mma_gemm_accelerator/`**: پروژه کامل DSE شتاب‌دهنده سخت‌افزاری MMA و مدل RiskMLP به همراه اسکریپت‌های تحلیلی پایتون.
+6. **`tech/45nm/`**: کتابخانه متن‌باز سلول استاندارد Nangate 45nm شامل مشخصات LEF، Liberty و Verilog.
 
-### ۲.۳. پوشه خروجی‌ها (`outputs/`)
+### ۲.۳. پوشه فعال ورودی‌ها (`inputs/`)
+پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و به صورت پیش‌فرض با معماری شتاب‌دهنده **GEMM** پیکربندی شده است:
+* `inputs/architectures/gemm_arch.yaml`: تعریف ساختار سخت‌افزاری واحدهای پردازشی و بافرها.
+* `inputs/constraints/gemm_constraints.yaml`: قیود نگاشت مکانی و زمانی.
+* `inputs/workloads/`: تعاریف تانسور و ابعاد مسئله (`gemm_ABZ.yaml`, `gemm_problem.yaml`, `gemm.cfg`).
+* `inputs/mapper/gemm_mapper.yaml`: تنظیمات الگوریتم جستجو و شرایط همگرایی ماپر.
+* `inputs/sample_gemm.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
+* `inputs/sample_model_gemm.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
+
+> **نحوه تعویض معماری فعال:** برای شبیه‌سازی هر معماری دلخواه دیگر، کافیست فایل‌های نمونه مورد نظر را از پوشه `examples/` درون `inputs/` کپی نمایید (مثلاً `cp -r examples/eyeriss/* inputs/`).
+
+### ۲.۴. پوشه خروجی‌ها (`outputs/`)
 تمامی باینری‌های اجرایی به طور پیش‌فرض پیکربندی شده‌اند که کلیه نتایج شبیه‌سازی را مستقیماً در پوشه **`outputs/`** تولید کنند (در صورت عدم وجود پوشه، برنامه به صورت خودکار آن را ایجاد می‌کند):
 * **`outputs/*.stats.txt`**: گزارش متنی تفکیک انرژی و توان اجزا، تعداد چرخه‌ها (Cycles)، و درصد بهره‌وری واحدها (Utilization).
 * **`outputs/*.map.txt`**: نگاشت بهینه پیدا شده (تایلینگ زمانی، مکانی و ترتیب حلقه‌ها).
@@ -91,7 +88,7 @@
 * **ماهیت Accelergy**: فریم‌ورک متن‌باز مستقل بر پایه پایتون (توسعه‌یافته در دانشگاه MIT) است که برای تخمین سطح معماری انرژی و مساحت شتاب‌دهنده‌ها به کار می‌رود. کد منبع پایتونی Accelergy داخل این مخزن C++ کامپایل نمی‌شود، بلکه به صورت یک ابزار خارجی مستقل فراخوانی می‌گردد.
 * **نقطه اتصال در سورس‌کد C++**:
   * پیاده‌سازی رابط: `src/util/accelergy_interface.cpp`
-  * فایل هدر: `include/util/accelergy_interface.hpp`
+  * فایل هدر: `src/util/accelergy_interface.hpp`
 * **مکانیزم فعال‌سازی و فراخوانی**:
   1. هنگام کامپایل با گزینه `scons --accelergy`، فلگ پیش‌پردازنده `USE_ACCELERGY` در کدهای C++ فعال می‌شود.
   2. در زمان اجرا، تایم‌لوپ ابزار Accelergy را به صورت یک پروسه خارجی از طریق متغیر محیطی `ACCELERGYPATH` یا دستور شل (`which accelergy`) اجرا می‌کند.
@@ -425,19 +422,19 @@ python3 plot_mma_dse.py
 #### ارزیابی قطعی با `timeloop-model`:
 ```bash
 source env/setup-env.bash
-timeloop-model inputs/samples/sample_model.cfg
+timeloop-model inputs/sample_model_gemm.yaml
 ```
 
 #### کاوش خودکار فضای نگاشت با `timeloop-mapper`:
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/samples/sample_mapper.yaml
+timeloop-mapper inputs/sample_gemm.yaml
 ```
 
-#### کاوش متصل به شبیه‌ساز توان و انرژی Accelergy:
+#### کاوش با نمونه متصل به شبیه‌ساز انرژی Accelergy:
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/samples/sample_accelergy.yaml
+timeloop-mapper examples/cnn_conv/samples/sample_accelergy.yaml
 ```
 خروجی‌ها شامل گزارش تفکیک توان، جداول ERT و ART، و نگاشت‌های بهینه در پوشه `outputs/` ذخیره می‌شوند.
 
@@ -477,14 +474,14 @@ source env/setup-env.bash
 
 #### ۳. اجرای شبیه‌سازی:
 ```bash
-# اجرای ارزیاب مستقیم با تولید خودکار خروجی در outputs/
-timeloop-model inputs/samples/sample_model.cfg
+# اجرای ارزیاب مستقیم GEMM با تولید خودکار خروجی در outputs/
+timeloop-model inputs/sample_model_gemm.yaml
 
-# اجرای کاوشگر خودکار ماپر
-timeloop-mapper inputs/samples/sample_mapper.yaml
+# اجرای کاوشگر خودکار ماپر برای GEMM
+timeloop-mapper inputs/sample_gemm.yaml
 
-# اجرای کاوشگر ماپر با Accelergy
-timeloop-mapper inputs/samples/sample_accelergy.yaml
+# اجرای نمونه کاوش با Accelergy
+timeloop-mapper examples/cnn_conv/samples/sample_accelergy.yaml
 
 # مشاهده نتایج ذخیره‌شده
 ls -lh outputs/
