@@ -38,7 +38,7 @@ This repository is maintained across two dedicated branches:
   - **`TechFile/`**: Semiconductor technology characterization files (Nangate 45nm LEF/Liberty).
   - **`mma_gemm_accelerator/`**: Concrete custom accelerator design project and DSE suite.
 * **`outputs/`**: All simulation results, performance counters, mappings, XML dumps, and execution logs are automatically directed to this directory.
-* **`src/` & `include/`**: C++ analytical simulation engine, polyhedral analysis pipeline, and application entry points (`master` branch).
+* **`src/`**: Unified C++ source tree containing both implementation (`.cpp`) and header (`.hpp`) files side-by-side (`master` branch).
 * **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
 
 ---
