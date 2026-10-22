@@ -1,0 +1,12 @@
+mapper:
+  algorithm: linear-pruned
+  optimization-metrics:
+    - energy
+    - delay
+  search-size: 200
+  victory-condition: 50
+  timeout: 50
+  live-status: false
+  log-suboptimal: true
+  log-stats: true
+  diagnostics: true
