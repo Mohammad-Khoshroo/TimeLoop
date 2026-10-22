@@ -1,22 +1,23 @@
 # Timeloop Standalone Binary Distribution (User Branch)
 
-[**📖 راهنمای فارسی کاربر نهایی (README-fa.md)**](README-fa.md)
+[Persian Documentation (README-fa.md)](README-fa.md)
 
-This branch provides a **ready-to-run, precompiled distribution** of the Timeloop / LoopTree simulation framework.
-**No C++ compiler, build tools, or SCons are required.**
+This branch provides a ready-to-run, precompiled binary distribution of the Timeloop / LoopTree simulation framework.
+No C++ compiler, build tools, or SCons are required.
 
 ---
 
-## ⚡ Quick Start (3 Steps)
+## Quick Start (3 Steps)
 
 ### 1. Install Runtime Dependencies
-Only standard shared libraries are needed:
+Only standard Linux shared libraries are needed:
 ```bash
 sudo apt update && sudo apt install -y \
     libyaml-cpp0.8 \
     libboost-iostreams1.83.0 \
     libncurses6 \
-    libtinfo6
+    libtinfo6 \
+    libisl23
 ```
 
 ### 2. Set Up Environment
@@ -27,44 +28,51 @@ source env/setup-env.bash
 This adds `runner/` to your `PATH` and sets `LD_LIBRARY_PATH` to `lib/`.
 
 ### 3. Run Simulation
-```bash
-# Evaluate a fixed mapping (direct model evaluation)
-timeloop-model inputs/configs/model/sample.cfg
 
-# Search and explore optimal mapping (mapper heuristic)
-timeloop-mapper inputs/configs/mapper/sample.yaml
+#### Evaluate a Fixed Mapping
+```bash
+timeloop-model inputs/configs/model/sample.cfg
+```
+
+#### Explore and Find Optimal Mapping
+```bash
+timeloop-mapper inputs/configs/mapper/sample.cfg
+```
+
+#### Evaluate Fused-Layer LoopTree Workloads
+```bash
+looptree-model inputs/configs/looptree/sample.yaml
 ```
 
 All simulation outputs (`*.stats.txt`, `*.map.txt`, `*.map+stats.xml`) will automatically be generated in the **`outputs/`** directory.
 
 ---
 
-## 📂 Directory Structure
+## Directory Structure
 
-```
-.
-├── runner/                 # Precompiled executables
-│   ├── timeloop-model      # Evaluates a specific mapping
-│   ├── timeloop-mapper     # Explores mapspace for optimal mapping
-│   ├── timeloop-metrics    # Workload-independent area/energy characteristics
-│   ├── timeloop-design-space
-│   └── timeloop-simple-mapper
-├── lib/                    # Precompiled shared library (libtimeloop-model.so)
-├── inputs/                 # Architecture, problem, and tech configs
-│   ├── configs/            # Architecture & mapper YAMLs
-│   ├── problem-shapes/     # Mathematical problem definitions (CNN, GEMM)
-│   └── TechFile/           # Physical characterization files (Nangate 45nm)
-├── outputs/                # Default destination for all simulation outputs
-├── env/
-│   └── setup-env.bash      # Path configuration script
-└── README.md
-```
+* **`runner/`**: Precompiled simulation executables:
+  - `looptree-model`: Fused-layer and loop tree simulation engine.
+  - `timeloop-model`: Direct mapping performance and energy evaluator.
+  - `timeloop-mapper`: Heuristic mapper exploring optimal spatial and temporal tiling.
+  - `timeloop-metrics`: Workload-independent silicon area and access energy extractor.
+  - `timeloop-design-space`: Hardware design space exploration tool.
+  - `timeloop-simple-mapper`: Lightweight mapper utility.
+  - `einsumgraph`: Einsum graph generator and parser.
+* **`lib/`**: Precompiled dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
+* **`inputs/`**: Unified repository for all YAML specifications:
+  - `inputs/configs/`: Architecture, constraints, and mapper configurations.
+  - `inputs/problem-shapes/`: Tensor mathematical definitions (CNN, GEMM).
+  - `inputs/TechFile/`: Technology characterization files (Nangate 45nm).
+  - `inputs/projects/`: Design projects (e.g. MMA GEMM accelerator and DSE suite).
+* **`outputs/`**: Default output directory for all simulation reports, maps, and logs.
+* **`env/`**: Shell environment configuration (`env/setup-env.bash`).
 
 ---
 
-## 🛠️ Need Source Code or Customization?
+## Need Source Code or Customization?
+
 If you need to modify the C++ simulation engine, add new hardware models, or build from source, switch to the developer branch:
 ```bash
 git checkout master
 ```
-See `README.md` on the `master` branch for full developer build instructions.
+See `README.md` on the `master` branch for developer build and Accelergy setup instructions.
