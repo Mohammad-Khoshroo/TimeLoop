@@ -356,14 +356,17 @@ inst_bins = env.Install(env["BUILD_BASE_DIR"] + '/runner', [
                                             bin_einsum_graph
                                             ])
 
-def cleanup_build(target, source, env):
-    import shutil
-    bdir = env["BUILD_BASE_DIR"] + '/build'
-    if os.path.exists(bdir):
-        print(">>> Build succeeded! Cleaning intermediate build directory...")
-        shutil.rmtree(bdir, ignore_errors=True)
+import atexit
+import shutil
 
-env.AddPostAction(inst_bins, cleanup_build)
+def cleanup_build():
+    if len(GetBuildFailures()) == 0:
+        bdir = env["BUILD_BASE_DIR"] + '/build'
+        if os.path.exists(bdir):
+            print(">>> Build succeeded! Cleaning intermediate build directory...", flush=True)
+            shutil.rmtree(bdir, ignore_errors=True)
+
+atexit.register(cleanup_build)
 
 #os.symlink(os.path.abspath('timeloop-mapper'), os.path.abspath('timeloop'))
 #os.symlink(os.path.abspath('timeloop-model'), os.path.abspath('model'))

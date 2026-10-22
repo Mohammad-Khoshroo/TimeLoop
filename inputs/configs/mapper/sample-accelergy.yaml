@@ -41,14 +41,14 @@ architecture:
         - name: DRAM
           class: DRAM
           attributes:
-            type: LPDDR4
+            type: "LPDDR4"
             word_bits: 8
             block_size: 64
             bandwidth: 10.0
         - name: WeightInputBuffer
           class: SRAM
           attributes:
-            technology: 45nm
+            technology: "45nm"
             width: 512
             depth: 4096
             datawidth: 8
@@ -57,7 +57,7 @@ architecture:
         - name: AccumulationBuffer[0..15]
           class: SRAM
           attributes:
-            technology: 45nm
+            technology: "45nm"
             depth: 128
             width: 24
             datawidth: 24
@@ -67,14 +67,14 @@ architecture:
         - name: MAC[0..1023]
           class: intmac
           attributes:
-            technology: 45nm
+            technology: "45nm"
             meshX: 16
             datawidth: 8
             word_bits: 8
         - name: Registers[0..1023]
           class: regfile
           attributes:
-            technology: 45nm
+            technology: "45nm"
             depth: 1
             width: 8
             datawidth: 8
