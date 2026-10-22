@@ -26,12 +26,12 @@
   - سیستم بیلد به نحوی تنظیم شده که پس از کامپایل و نصب موفق باینری‌ها در `runner/`، درخت موقت فایل‌های میانی `build/` به طور خودکار پاک‌سازی می‌شود.
 * **کتابخانه‌های اشتراکی (`lib/`):** فایل `libtimeloop-model.so` برای استفاده در زمان اجرا.
 
-### ۲.۲. پوشه ورودی‌ها (`input/`)
-کلیه ورودی‌های YAML و تعاریف سخت‌افزار به صورت یکپارچه درون پوشه **`input/`** قرار دارند:
-1. فایل‌های پیکربندی ماپر و مدل: `input/sample_mapper.yaml`، `input/sample_model.cfg`، `input/sample_accelergy.yaml`.
-2. فرمولاسیون ریاضی و ابعاد تانسورها: `input/cnn_layer.yaml`، `input/gemm_ABZ.yaml`.
-3. کتابخانه فناوری نیمه‌هادی: `input/TechFile/` (Nangate 45nm).
-4. پروژه نمونه شتاب‌دهنده سخت‌افزاری MMA و DSE: `input/mma_gemm_accelerator/`.
+### ۲.۲. پوشه ورودی‌ها (`inputs/`)
+کلیه ورودی‌های YAML و تعاریف سخت‌افزار به صورت یکپارچه درون پوشه **`inputs/`** قرار دارند:
+1. فایل‌های پیکربندی ماپر و مدل: `inputs/sample_mapper.yaml`، `inputs/sample_model.cfg`، `inputs/sample_accelergy.yaml`.
+2. فرمولاسیون ریاضی و ابعاد تانسورها: `inputs/cnn_layer.yaml`، `inputs/gemm_ABZ.yaml`.
+3. کتابخانه فناوری نیمه‌هادی: `inputs/TechFile/` (Nangate 45nm).
+4. پروژه نمونه شتاب‌دهنده سخت‌افزاری MMA و DSE: `inputs/mma_gemm_accelerator/`.
 
 ### ۲.۳. پوشه خروجی‌ها (`outputs/`)
 کلیه ابزارهای اجرایی به طور پیش‌فرض نتایج شبیه‌سازی را مستقیماً درون پوشه **`outputs/`** ذخیره می‌کنند (و در صورت عدم وجود پوشه، آن را به شکل خودکار می‌سازند):

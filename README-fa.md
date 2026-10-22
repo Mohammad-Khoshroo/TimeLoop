@@ -6,7 +6,7 @@
 
 ## فهرست مطالب
 - [۱. تبارشناسی و معماری سه نسل (Timeloop -> Sparseloop -> LoopTree)](#۱-تبارشناسی-و-معماری-سه-نسل-timeloop---sparseloop---looptree)
-- [۲. ساختار مخزن: فایل‌های اجرایی (`runner/`)، پوشه ورودی‌ها (`input/`) و خروجی‌ها (`outputs/`)](#۲-ساختار-مخزن-فایلهای-اجرایی-runner-پوشه-ورودیها-input-و-خروجیها-outputs)
+- [۲. ساختار مخزن: فایل‌های اجرایی (`runner/`)، پوشه ورودی‌ها (`inputs/`) و خروجی‌ها (`outputs/`)](#۲-ساختار-مخزن-فایلهای-اجرایی-runner-پوشه-ورودیها-inputs-و-خروجیها-outputs)
 - [۳. ماتریس جامع تمام قابلیت‌های قابل استفاده در این ابزار](#۳-ماتریس-جامع-تمام-قابلیتهای-قابل-استفاده-در-این-ابزار)
   - [قابلیت ۱: کاوش هوشمند فضای نگاشت (Heuristic Mapping Exploration)](#قابلیت-۱-کاوش-هوشمند-فضای-نگاشت-heuristic-mapping-exploration)
   - [قابلیت ۲: ثبت لاگ تمام حالات موفق و مصورسازی فضای سرچ (DSE Logging & Plotting)](#قابلیت-۲-ثبت-لاگ-تمام-حالات-موفق-و-مصورسازی-فضای-سرچ-dse-logging--plotting)
@@ -19,7 +19,7 @@
   - [قابلیت ۹: مدل‌سازی شتاب‌دهنده‌های لایه‌-فیوز شده (LoopTree: Fused Layers & Tree Mapping)](#قابلیت-۹-مدلسازی-شتابدهندههای-لایه‌-فیوز-شده-looptree-fused-layers--tree-mapping)
   - [قابلیت ۱۰: مدل‌سازی شبکه ارتباطی درون‌تراشه‌ای و چندپخشی (NoC & Multicast)](#قابلیت-۱۰-مدلسازی-شبکه-ارتباطی-درونتراشهای-و-چندپخشی-noc--multicast)
 - [۴. پروژه‌های نمونه عملی و اسکریپت‌های تست‌شده](#۴-پروژه‌های-نمونه-عملی-و-اسکریپت‌های-تست‌شده)
-  - [پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`input/mma_gemm_accelerator/`)](#پروژه-۱-شبیه‌سازی-شتاب‌دهنده-سخت‌افزاری-واقعی-mma-و-مدل-riskmlp-به-همراه-dse-inputmma_gemm_accelerator)
+  - [پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`inputs/mma_gemm_accelerator/`)](#پروژه-۱-شبیه‌سازی-شتاب‌دهنده-سخت‌افزاری-واقعی-mma-و-مدل-riskmlp-به-همراه-dse-inputsmma_gemm_accelerator)
   - [پروژه ۲: ارزیابی و کاوش با Accelergy و نگاشت بهینه](#پروژه-۲-ارزیابی-و-کاوش-با-accelergy-و-نگاشت-بهینه)
 - [۵. راهنمای راه‌اندازی و استفاده بر اساس نقش (شاخه‌های `user` و `master`)](#۵-راهنمای-راهاندازی-و-استفاده-بر-اساس-نقش-شاخههای-user-و-master)
   - [۵.۱. راهنمای شاخه `user` (کاربر نهایی - آماده اجرا بدون نیاز به کامپایل)](#۵۱-راهنمای-شاخه-user-کاربر-نهایی---آماده-اجرا-بدون-نیاز-به-کامپایل)
@@ -41,7 +41,7 @@
 
 ---
 
-## ۲. ساختار مخزن: فایل‌های اجرایی (`runner/`)، پوشه ورودی‌ها (`input/`) و خروجی‌ها (`outputs/`)
+## ۲. ساختار مخزن: فایل‌های اجرایی (`runner/`)، پوشه ورودی‌ها (`inputs/`) و خروجی‌ها (`outputs/`)
 
 ### ۲.۱. فایل‌های اجرایی (`runner/`) و تمیزسازی خودکار `build/`
 * **پوشه `runner/` (محل استقرار باینری‌های اجرایی نهایی):**
@@ -57,19 +57,19 @@
   - فرآیند کامپایل فایل‌های میانی را در `build/` ایجاد می‌کند؛ با این حال در پیکربندی سیستم بیلد، هوک خودکار پس از اتمام موفقیت‌آمیز ساخت اجرا شده و پوشه `build/` را پاک‌سازی می‌کند تا مخزن همواره تمیز و کم‌حجم باقی بماند.
 * **کتابخانه‌های اشتراکی (`lib/`):** کتابخانه نهایی کامپایل‌شده `libtimeloop-model.so` در پوشه `lib/` نصب می‌شود و در زمان اجرا به `LD_LIBRARY_PATH` متصل است.
 
-### ۲.۲. پوشه ورودی‌ها (`input/`)
-کلیه فایل‌های پیکربندی معماری، مسئله‌ها و مشخصات تکنولوژی به صورت یکپارچه درون پوشه **`input/`** قرار دارند (بدون پوشه‌های تودرتو یا جداگانه):
+### ۲.۲. پوشه ورودی‌ها (`inputs/`)
+کلیه فایل‌های پیکربندی معماری، مسئله‌ها و مشخصات تکنولوژی به صورت یکپارچه درون پوشه **`inputs/`** قرار دارند (بدون پوشه‌های تودرتو یا جداگانه):
 1. **فایل‌های نمونه معماری و ماپر:**
-   * `input/sample_model.cfg`: ارزیابی مستقیم معماری و نگاشت با `timeloop-model`.
-   * `input/sample_mapper.yaml`: کاوش خودکار فضای نگاشت با `timeloop-mapper`.
-   * `input/sample_accelergy.yaml`: کاوش ماپر متصل به ابزار Accelergy برای تخمین دقیق توان و انرژی.
+   * `inputs/sample_model.cfg`: ارزیابی مستقیم معماری و نگاشت با `timeloop-model`.
+   * `inputs/sample_mapper.yaml`: کاوش خودکار فضای نگاشت با `timeloop-mapper`.
+   * `inputs/sample_accelergy.yaml`: کاوش ماپر متصل به ابزار Accelergy برای تخمین دقیق توان و انرژی.
 2. **اشکال ریاضی تانسورها:**
-   * `input/cnn_layer.yaml`: فرمولاسیون ریاضی لایه‌های کانولوشن.
-   * `input/gemm_ABZ.yaml`: فرمولاسیون ضرب ماتریسی عمومی (GEMM).
+   * `inputs/cnn_layer.yaml`: فرمولاسیون ریاضی لایه‌های کانولوشن.
+   * `inputs/gemm_ABZ.yaml`: فرمولاسیون ضرب ماتریسی عمومی (GEMM).
 3. **مشخصات فناوری نیمه‌هادی:**
-   * `input/TechFile/`: کتابخانه Nangate 45nm شامل فایل‌های LEF و Liberty.
+   * `inputs/TechFile/`: کتابخانه Nangate 45nm شامل فایل‌های LEF و Liberty.
 4. **پروژه شتاب‌دهنده سخت‌افزاری:**
-   * `input/mma_gemm_accelerator/`: مدلسازی سخت‌افزاری شتاب‌دهنده ماتریسی واقعی MMA به همراه اسکریپت‌های DSE و رسم نمودارها.
+   * `inputs/mma_gemm_accelerator/`: مدلسازی سخت‌افزاری شتاب‌دهنده ماتریسی واقعی MMA به همراه اسکریپت‌های DSE و رسم نمودارها.
 
 ### ۲.۳. پوشه خروجی‌ها (`outputs/`)
 تمامی باینری‌های اجرایی به طور پیش‌فرض پیکربندی شده‌اند که کلیه نتایج شبیه‌سازی را مستقیماً در پوشه **`outputs/`** تولید کنند (در صورت عدم وجود پوشه، برنامه به صورت خودکار آن را ایجاد می‌کند):
@@ -154,7 +154,7 @@ mapper:
 ```
 
 #### اسکریپت استخراج لاگ‌ها و تولید نمودارها:
-اسکریپت تخصصی [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator/plot_mma_dse.py) تمام لاگ‌ها را پارس کرده و فایل‌های تحلیلی، جبهه پارتو و نمودارهای جامع تفکیک توان را تولید می‌کند.
+اسکریپت تخصصی [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/plot_mma_dse.py) تمام لاگ‌ها را پارس کرده و فایل‌های تحلیلی، جبهه پارتو و نمودارهای جامع تفکیک توان را تولید می‌کند.
 1. `all_evaluated_candidates.csv`: ثبت مشخصات تمام نگاشت‌های موفق در طول سرچ (بهره‌وری، انرژی، ساختار حلقه).
 2. `dse_comprehensive_report.png`: نمودار ۴ قسمتی شامل جبهه پارتو، تفکیک توان، تریدآف بافر و TOPS/W.
 3. `search_space_all_candidates.png`: نمودار پراکندگی (Scatter Plot) کل فضای سرچ.
@@ -278,7 +278,7 @@ timeloop-design-space arch_sweep.yaml problem.yaml
 ```
 
 #### روش ۲: اتوماسیون پایتونی جامع
-اسکریپت [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator/run_mma_dse.py) پارامترها را در فایل کانفیگ تغییر داده، ماپر را اجرا کرده، فایل XML را پارس می‌کند و جداول مقایسه‌ای و نمودارها را تولید می‌نماید.
+اسکریپت [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/run_mma_dse.py) پارامترها را در فایل کانفیگ تغییر داده، ماپر را اجرا کرده، فایل XML را پارس می‌کند و جداول مقایسه‌ای و نمودارها را تولید می‌نماید.
 
 ---
 
@@ -375,7 +375,7 @@ LoopTree محاسبه می‌کند که آیا نگه‌داری داده‌ه�
 
 در این مخزن، پروژه‌های عملی و پیکربندی‌های آزموده‌شده برای استفاده مستقیم آماده شده است:
 
-### پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`input/mma_gemm_accelerator/`)
+### پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`inputs/mma_gemm_accelerator/`)
 
 این پروژه مدلسازی دقیق سخت‌افزار واقعی شتاب‌دهنده ماتریسی پروژه بر اساس کد RTL واقعی ([nvdla_matrix_multiplication_4x4.v](file:///D:/UT.CE/MCI/GEMM-accelerator/HW/acc/nvdla_matrix_multiplication_4x4.v) و [matrix_multiplication_accelerator.v](file:///D:/UT.CE/MCI/GEMM-accelerator/HW/mma/matrix_multiplication_accelerator.v)) است:
 
@@ -384,21 +384,21 @@ LoopTree محاسبه می‌کند که آیا نگه‌داری داده‌ه�
   * **رجیسترهای اکومولاتور (`acc_reg`)**: رجیستر ۳۲ بیتی جهت انباشت بدون سرریز ضرب‌های جزئی در جریان داده Output Stationary.
   * **بافرهای پینگ‌پنگ**: بافر ورودی اشتراکی (`IA_BUF`) با برودکست به تمام ستون‌ها، بافر محلی وزن‌ها (`W_BUF`)، بافر محلی خروجی (`OA_BUF`).
   * **ارتباط با حافظه اصلی**: اتصال از طریق Dedicated DMA و گذرگاه اشتراکی ۶۴ بیتی به DRAM.
-  * **تکنولوژی ساخت**: کتابخانه متن‌باز **45nm Nangate Open Cell** مستقر در [input/TechFile/45nm/](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/TechFile/45nm).
+  * **تکنولوژی ساخت**: کتابخانه متن‌باز **45nm Nangate Open Cell** مستقر در [inputs/TechFile/45nm/](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/TechFile/45nm).
 * **بار کاری واقعی**: ۳ لایه مدل تخمین ریسک خودروهای خودران (**RiskMLP**):
   * لایه ۱: $M=1, K=16, N=64$
   * لایه ۲: $M=1, K=64, N=64$
   * لایه ۳: $M=1, K=64, N=3$
 * **فایل‌های پیاده‌سازی**:
-  * [arch_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator/arch_mma.yaml): معماری سلسله‌مراتبی شتاب‌دهنده.
-  * [constraints_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator/constraints_mma.yaml): قیود نگاشت مکانی و جریان داده Output Stationary.
-  * [problem_risk_mlp.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator/problem_risk_mlp.yaml): ابعاد لایه‌های RiskMLP.
-  * [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator/run_mma_dse.py): موتور DSE پارامتریک برای جاروب بلوک‌تری‌ها، سایز بافرها، فرکانس و لایه‌ها به همراه استخراج **تمام نقاط ساب‌اپتیمال**.
-  * [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator/plot_mma_dse.py): رسم ۴ نمودار پیشرفته تحلیلی (پرتو، فضای جستجو، تفکیک توان، کارایی کل RiskMLP).
+  * [arch_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/arch_mma.yaml): معماری سلسله‌مراتبی شتاب‌دهنده.
+  * [constraints_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/constraints_mma.yaml): قیود نگاشت مکانی و جریان داده Output Stationary.
+  * [problem_risk_mlp.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/problem_risk_mlp.yaml): ابعاد لایه‌های RiskMLP.
+  * [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/run_mma_dse.py): موتور DSE پارامتریک برای جاروب بلوک‌تری‌ها، سایز بافرها، فرکانس و لایه‌ها به همراه استخراج **تمام نقاط ساب‌اپتیمال**.
+  * [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/plot_mma_dse.py): رسم ۴ نمودار پیشرفته تحلیلی (پرتو، فضای جستجو، تفکیک توان، کارایی کل RiskMLP).
 
 #### دستورات اجرا:
 ```bash
-cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo/input/mma_gemm_accelerator
+cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator
 
 # ۱. اجرای کامل کاوش فضای طراحی (۶۰ سناریو + ۲۰,۰۸۵ نقطه ساب‌اپتیمال)
 python3 run_mma_dse.py --bts 2 4 8 16 32 --bufs 128 256 512 1024 --freq 500.0
@@ -416,19 +416,19 @@ python3 plot_mma_dse.py
 #### ارزیابی قطعی با `timeloop-model`:
 ```bash
 source env/setup-env.bash
-timeloop-model input/sample_model.cfg
+timeloop-model inputs/sample_model.cfg
 ```
 
 #### کاوش خودکار فضای نگاشت با `timeloop-mapper`:
 ```bash
 source env/setup-env.bash
-timeloop-mapper input/sample_mapper.yaml
+timeloop-mapper inputs/sample_mapper.yaml
 ```
 
 #### کاوش متصل به شبیه‌ساز توان و انرژی Accelergy:
 ```bash
 source env/setup-env.bash
-timeloop-mapper input/sample_accelergy.yaml
+timeloop-mapper inputs/sample_accelergy.yaml
 ```
 خروجی‌ها شامل گزارش تفکیک توان، جداول ERT و ART، و نگاشت‌های بهینه در پوشه `outputs/` ذخیره می‌شوند.
 
@@ -469,13 +469,13 @@ source env/setup-env.bash
 #### ۳. اجرای شبیه‌سازی:
 ```bash
 # اجرای ارزیاب مستقیم با تولید خودکار خروجی در outputs/
-timeloop-model input/sample_model.cfg
+timeloop-model inputs/sample_model.cfg
 
 # اجرای کاوشگر خودکار ماپر
-timeloop-mapper input/sample_mapper.yaml
+timeloop-mapper inputs/sample_mapper.yaml
 
 # اجرای کاوشگر ماپر با Accelergy
-timeloop-mapper input/sample_accelergy.yaml
+timeloop-mapper inputs/sample_accelergy.yaml
 
 # مشاهده نتایج ذخیره‌شده
 ls -lh outputs/

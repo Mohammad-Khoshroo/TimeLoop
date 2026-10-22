@@ -23,7 +23,7 @@ This repository is maintained across two dedicated branches:
      git clone -b user https://github.com/Mohammad-Khoshroo/TimeLoop.git timeloop-user
      cd timeloop-user
      source env/setup-env.bash
-     timeloop-model input/sample_model.cfg
+     timeloop-model inputs/sample_model.cfg
      ```
 
 ---
@@ -31,7 +31,7 @@ This repository is maintained across two dedicated branches:
 ## Directory Structure
 
 * **`runner/`**: Consolidated directory containing precompiled simulation executables (`looptree-model`, `timeloop-mapper`, `timeloop-model`, `timeloop-metrics`, `timeloop-design-space`, `timeloop-simple-mapper`, `einsumgraph`).
-* **`input/`**: Unified repository for all YAML specifications and configurations:
+* **`inputs/`**: Unified repository for all YAML specifications and configurations:
   - `sample_model.cfg`: Sample architecture and mapping specification for deterministic evaluation.
   - `sample_mapper.yaml`: Comprehensive architecture, mapping constraints, and mapper search settings.
   - `sample_accelergy.yaml`: Accelergy integration configuration for accurate energy modeling.
@@ -104,19 +104,19 @@ Upon a successful build:
 ### Single-Layer Evaluation (`timeloop-model`)
 ```bash
 source env/setup-env.bash
-timeloop-model input/sample_model.cfg
+timeloop-model inputs/sample_model.cfg
 ```
 
 ### Mapping Exploration (`timeloop-mapper`)
 ```bash
 source env/setup-env.bash
-timeloop-mapper input/sample_mapper.yaml
+timeloop-mapper inputs/sample_mapper.yaml
 ```
 
 ### Accelergy-Enabled Exploration (`timeloop-mapper` with Accelergy)
 ```bash
 source env/setup-env.bash
-timeloop-mapper input/sample_accelergy.yaml
+timeloop-mapper inputs/sample_accelergy.yaml
 ```
 
 All generated summary tables (`*.stats.txt`), optimal tile mappings (`*.map.txt`), and structured logs (`*.map+stats.xml`) will be stored directly inside `outputs/`.
