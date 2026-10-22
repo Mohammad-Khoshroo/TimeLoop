@@ -34,6 +34,11 @@ bool ParseArgs(int argc, char* argv[],
                std::vector<std::string>& input_files,
                std::string& output_dir)
 {
+  if (output_dir.empty() || output_dir == ".")
+  {
+    output_dir = "outputs";
+  }
+
   // Very rudimentary argument parsing. The only recognized pattern is "-o <odir>"
   // and a set of .yaml or .cfg files.
   std::vector<std::string> input_args(argv + 1, argv + argc);
@@ -43,17 +48,6 @@ bool ParseArgs(int argc, char* argv[],
     {
       arg++;
       output_dir = *arg;
-      struct stat info;
-      if (stat(output_dir.c_str(), &info) != 0)
-      {
-        std::cerr << "ERROR: cannot access output directory: " << output_dir << std::endl;
-        return false;
-      }
-      else if (!(info.st_mode & S_IFDIR))
-      {
-        std::cerr << "ERROR: non-existent output directory: " << output_dir << std::endl;
-        return false;
-      }
     }
     else if (arg->compare("timeloop-mapper.map.yaml") == 0)
     {
@@ -64,6 +58,13 @@ bool ParseArgs(int argc, char* argv[],
     {
       input_files.push_back(*arg);
     }
+  }
+
+  // Ensure output directory exists (create if missing)
+  struct stat info;
+  if (stat(output_dir.c_str(), &info) != 0)
+  {
+    mkdir(output_dir.c_str(), 0775);
   }
 
   for (auto& file: input_files)

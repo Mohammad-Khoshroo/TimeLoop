@@ -1,7 +1,7 @@
 /build/
 /src/pat
 /lib/
-/bin/
+/runner/
 
 # Generated output
 timeloop-output.pkl
@@ -53,3 +53,10 @@ venv
 ### Documentation
 .doxygen-config.bak
 docs/
+
+# VRDocs engine directory
+.vrdocs/
+
+# Ignore simulation outputs except gitkeep
+outputs/*
+!outputs/.gitkeep

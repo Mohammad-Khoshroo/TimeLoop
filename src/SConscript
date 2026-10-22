@@ -344,7 +344,7 @@ bin_compound_config_test = env.Program(target = 'timeloop-config-test', source =
 bin_looptree_model = env.Program(target='looptree-model', source=looptree_sources)
 bin_einsum_graph = env.Program(target='einsumgraph', source=einsumgraph_sources)
 
-env.Install(env["BUILD_BASE_DIR"] + '/bin', [
+inst_bins = env.Install(env["BUILD_BASE_DIR"] + '/runner', [
                                             bin_metrics,
                                             bin_model,
                                             bin_simple_mapper,
@@ -355,6 +355,15 @@ env.Install(env["BUILD_BASE_DIR"] + '/bin', [
                                             bin_looptree_model,
                                             bin_einsum_graph
                                             ])
+
+def cleanup_build(target, source, env):
+    import shutil
+    bdir = env["BUILD_BASE_DIR"] + '/build'
+    if os.path.exists(bdir):
+        print(">>> Build succeeded! Cleaning intermediate build directory...")
+        shutil.rmtree(bdir, ignore_errors=True)
+
+env.AddPostAction(inst_bins, cleanup_build)
 
 #os.symlink(os.path.abspath('timeloop-mapper'), os.path.abspath('timeloop'))
 #os.symlink(os.path.abspath('timeloop-model'), os.path.abspath('model'))
