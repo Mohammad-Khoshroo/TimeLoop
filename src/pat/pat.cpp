@@ -28,7 +28,7 @@
 #include <cassert>
 #include <iostream>
 
-#include "pat.hpp"
+#include "pat/pat.hpp"
 
 namespace pat
 {
