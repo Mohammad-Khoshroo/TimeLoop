@@ -27,11 +27,12 @@
 * **کتابخانه‌های اشتراکی (`lib/`):** فایل `libtimeloop-model.so` برای استفاده در زمان اجرا.
 
 ### ۲.۲. پوشه ورودی‌ها (`inputs/`)
-کلیه ورودی‌های YAML و تعاریف سخت‌افزار به صورت یکپارچه درون پوشه **`inputs/`** قرار دارند:
-1. فایل‌های پیکربندی ماپر و مدل: `inputs/sample_mapper.yaml`، `inputs/sample_model.cfg`، `inputs/sample_accelergy.yaml`.
-2. فرمولاسیون ریاضی و ابعاد تانسورها: `inputs/cnn_layer.yaml`، `inputs/gemm_ABZ.yaml`.
-3. کتابخانه فناوری نیمه‌هادی: `inputs/TechFile/` (Nangate 45nm).
-4. پروژه نمونه شتاب‌دهنده سخت‌افزاری MMA و DSE: `inputs/mma_gemm_accelerator/`.
+کلیه ورودی‌های YAML و تعاریف سخت‌افزار به تفکیک حوزه‌های کاری در پوشه‌های زیر دسته‌بندی شده‌اند:
+1. **پوشه `inputs/workloads/`:** فرمولاسیون ریاضی و ابعاد تانسورها (`cnn_layer.yaml`, `gemm_ABZ.yaml`, `chen_asplos2014.yaml`, `eyeriss_256_split_problem.yaml`).
+2. **پوشه `inputs/architectures/`:** تعاریف معماری سخت‌افزار (`eyeriss_256.yaml`, `eyeriss_1024.cfg`, `gemm.cfg`, `simba_chip.cfg`, ...).
+3. **پوشه `inputs/samples/`:** فایل‌های آماده اجرا برای ارزیابی و کاوش (`sample_model.cfg`, `sample_mapper.yaml`, `sample_accelergy.yaml`).
+4. **پوشه `inputs/TechFile/`:** کتابخانه فناوری نیمه‌هادی (Nangate 45nm).
+5. **پوشه `inputs/mma_gemm_accelerator/`:** پروژه نمونه شتاب‌دهنده سخت‌افزاری MMA و DSE.
 
 ### ۲.۳. پوشه خروجی‌ها (`outputs/`)
 کلیه ابزارهای اجرایی به طور پیش‌فرض نتایج شبیه‌سازی را مستقیماً درون پوشه **`outputs/`** ذخیره می‌کنند (و در صورت عدم وجود پوشه، آن را به شکل خودکار می‌سازند):

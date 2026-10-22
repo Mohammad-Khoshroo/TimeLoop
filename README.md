@@ -23,7 +23,7 @@ This repository is maintained across two dedicated branches:
      git clone -b user https://github.com/Mohammad-Khoshroo/TimeLoop.git timeloop-user
      cd timeloop-user
      source env/setup-env.bash
-     timeloop-model inputs/sample_model.cfg
+     timeloop-model inputs/samples/sample_model.cfg
      ```
 
 ---
@@ -31,13 +31,12 @@ This repository is maintained across two dedicated branches:
 ## Directory Structure
 
 * **`runner/`**: Consolidated directory containing precompiled simulation executables (`looptree-model`, `timeloop-mapper`, `timeloop-model`, `timeloop-metrics`, `timeloop-design-space`, `timeloop-simple-mapper`, `einsumgraph`).
-* **`inputs/`**: Unified repository for all YAML specifications and configurations:
-  - `sample_model.cfg`: Sample architecture and mapping specification for deterministic evaluation.
-  - `sample_mapper.yaml`: Comprehensive architecture, mapping constraints, and mapper search settings.
-  - `sample_accelergy.yaml`: Accelergy integration configuration for accurate energy modeling.
-  - `cnn_layer.yaml`, `gemm_ABZ.yaml`: Tensor problem definitions.
-  - `TechFile/`: Semiconductor technology characterization files (Nangate 45nm LEF/Liberty).
-  - `mma_gemm_accelerator/`: Concrete accelerator design project and DSE suite.
+* **`inputs/`**: Structured repository organized into clean functional categories:
+  - **`workloads/`**: Tensor problem definitions and mathematical formulations (`cnn_layer.yaml`, `gemm_ABZ.yaml`, `chen_asplos2014.yaml`, `eyeriss_256_split_problem.yaml`).
+  - **`architectures/`**: Hardware accelerator designs and component specifications (`eyeriss_256.yaml`, `eyeriss_1024.cfg`, `gemm.cfg`, `simba_chip.cfg`, etc.).
+  - **`samples/`**: Ready-to-run end-to-end evaluation and mapper exploration templates (`sample_model.cfg`, `sample_mapper.yaml`, `sample_accelergy.yaml`, `sample_mapper.cfg`, `mapperstats.cfg`).
+  - **`TechFile/`**: Semiconductor technology characterization files (Nangate 45nm LEF/Liberty).
+  - **`mma_gemm_accelerator/`**: Concrete custom accelerator design project and DSE suite.
 * **`outputs/`**: All simulation results, performance counters, mappings, XML dumps, and execution logs are automatically directed to this directory.
 * **`src/` & `include/`**: C++ analytical simulation engine, polyhedral analysis pipeline, and application entry points (`master` branch).
 * **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
@@ -104,19 +103,19 @@ Upon a successful build:
 ### Single-Layer Evaluation (`timeloop-model`)
 ```bash
 source env/setup-env.bash
-timeloop-model inputs/sample_model.cfg
+timeloop-model inputs/samples/sample_model.cfg
 ```
 
 ### Mapping Exploration (`timeloop-mapper`)
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/sample_mapper.yaml
+timeloop-mapper inputs/samples/sample_mapper.yaml
 ```
 
 ### Accelergy-Enabled Exploration (`timeloop-mapper` with Accelergy)
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/sample_accelergy.yaml
+timeloop-mapper inputs/samples/sample_accelergy.yaml
 ```
 
 All generated summary tables (`*.stats.txt`), optimal tile mappings (`*.map.txt`), and structured logs (`*.map+stats.xml`) will be stored directly inside `outputs/`.
