@@ -373,8 +373,8 @@ def generate_tech_plots(df_opt, df_cands, tech_key, tech_info, output_dir):
     plt.savefig(output_dir / "mma_dse_search_space.png", dpi=250)
     plt.close()
         
-    # ۳. نمودار تفکیک انباشته توان مصرفی اجزا (Stacked Power Breakdown)
-    fig, ax = plt.subplots(figsize=(12, 6))
+    # ۳. نمودار دوگانه تفکیک توان مصرفی اجزا (On-Chip Core vs. Off-Chip DRAM)
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
     sub = df_opt[df_opt["buf_size_B"] == 256].copy()
     if sub.empty:
         sub = df_opt.copy()
@@ -386,19 +386,30 @@ def generate_tech_plots(df_opt, df_cands, tech_key, tech_info, output_dir):
     p_reg = sub["power_reg_mW"].values
     p_sram = sub["power_sram_mW"].values
     p_dram = sub["power_dram_mW"].values
+    p_onchip = p_mac + p_reg + p_sram
     
-    ax.bar(x, p_mac, width, label="Compute MACs (INT8)", color="#2b5c8f", edgecolor='black', linewidth=0.5)
-    ax.bar(x, p_reg, width, bottom=p_mac, label="acc_reg (32-bit Accumulator)", color="#4682b4", edgecolor='black', linewidth=0.5)
-    ax.bar(x, p_sram, width, bottom=p_mac + p_reg, label="On-Chip Buffers (IA, W, OA)", color="#48d1cc", edgecolor='black', linewidth=0.5)
-    ax.bar(x, p_dram, width, bottom=p_mac + p_reg + p_sram, label="DRAM / SharedBus", color="#e76f51", edgecolor='black', linewidth=0.5)
+    # نمودار ۱: تفکیک دقیق توان درون تراشه شتاب‌دهنده (On-Chip Core Breakdown)
+    ax1.bar(x, p_mac, width, label="Compute MACs (INT8)", color="#2b5c8f", edgecolor='black', linewidth=0.5)
+    ax1.bar(x, p_reg, width, bottom=p_mac, label="acc_reg (32-bit Accumulator)", color="#4682b4", edgecolor='black', linewidth=0.5)
+    ax1.bar(x, p_sram, width, bottom=p_mac + p_reg, label="On-Chip Buffers (IA, W, OA)", color="#48d1cc", edgecolor='black', linewidth=0.5)
+    ax1.set_title(f"On-Chip MMA Core Power Breakdown (Excl. DRAM) - {tech_info['name']}", fontsize=11, fontweight='bold', pad=12)
+    ax1.set_xlabel("Workload Layer & BT Configuration", fontsize=10, fontweight='bold')
+    ax1.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
+    ax1.set_xticks(x)
+    ax1.set_xticklabels(labels, fontsize=8)
+    ax1.legend(title="Core Modules", fontsize=9, loc='upper right')
+    ax1.grid(True, axis='y', linestyle=':', alpha=0.6)
     
-    ax.set_title(f"Hardware Module Power Breakdown (mW) - {tech_info['name']}", fontsize=12, fontweight='bold', pad=12)
-    ax.set_xlabel("Workload Layer & BT Configuration", fontsize=10, fontweight='bold')
-    ax.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
-    ax.set_xticks(x)
-    ax.set_xticklabels(labels, fontsize=8)
-    ax.legend(title="Hardware Component", fontsize=9, loc='upper right')
-    ax.grid(True, axis='y', linestyle=':', alpha=0.6)
+    # نمودار ۲: مقایسه توان کل تراشه با حافظه خارجی (Total System: Core vs DRAM)
+    ax2.bar(x, p_onchip, width, label="On-Chip Core Power", color="#48bfe3", edgecolor='black', linewidth=0.5)
+    ax2.bar(x, p_dram, width, bottom=p_onchip, label="Off-Chip DRAM / SharedBus", color="#e76f51", edgecolor='black', linewidth=0.5)
+    ax2.set_title(f"System-Level Power: Core vs. Off-Chip DRAM - {tech_info['name']}", fontsize=11, fontweight='bold', pad=12)
+    ax2.set_xlabel("Workload Layer & BT Configuration", fontsize=10, fontweight='bold')
+    ax2.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
+    ax2.set_xticks(x)
+    ax2.set_xticklabels(labels, fontsize=8)
+    ax2.legend(title="System Domain", fontsize=9, loc='upper right')
+    ax2.grid(True, axis='y', linestyle=':', alpha=0.6)
     
     plt.tight_layout()
     plt.savefig(output_dir / "mma_dse_power_breakdown.png", dpi=250)
@@ -531,26 +542,36 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
     plt.savefig(comparison_dir / "tech_scaling_comparison.png", dpi=250)
     plt.close()
     
-    # ۲. نمودار مقایسه انباشته تفکیک توان مصرفی در میان فناوری‌ها
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # ۲. نمودار مقایسه انباشته تفکیک توان مصرفی در میان فناوری‌ها (دو پنل مجزا: درون تراشه و کل سیستم)
+    fig, (ax_core, ax_sys) = plt.subplots(1, 2, figsize=(15, 6))
     width = 0.5
     p_mac_all = comp_df["MAC_Power_mW"].values
     p_reg_all = comp_df["AccReg_Power_mW"].values
     p_sram_all = comp_df["SRAM_Power_mW"].values
     p_dram_all = comp_df["DRAM_Power_mW"].values
+    p_core_all = p_mac_all + p_reg_all + p_sram_all
     
-    ax.bar(x, p_mac_all, width, label="Compute MACs (INT8)", color="#2b5c8f", edgecolor='black', linewidth=0.6)
-    ax.bar(x, p_reg_all, width, bottom=p_mac_all, label="acc_reg (32-bit Accumulator)", color="#4682b4", edgecolor='black', linewidth=0.6)
-    ax.bar(x, p_sram_all, width, bottom=p_mac_all + p_reg_all, label="On-Chip Buffers (IA, W, OA)", color="#48d1cc", edgecolor='black', linewidth=0.6)
-    ax.bar(x, p_dram_all, width, bottom=p_mac_all + p_reg_all + p_sram_all, label="DRAM / SharedBus", color="#e76f51", edgecolor='black', linewidth=0.6)
-    
-    ax.set_title("Average Power Breakdown across Process Technology Nodes (mW)", fontsize=12, fontweight='bold', pad=12)
-    ax.set_xticks(x)
-    ax.set_xticklabels(tech_keys, fontsize=10, fontweight='bold')
-    ax.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
-    ax.legend(title="Hardware Module", fontsize=9, loc='upper left')
-    ax.grid(True, axis='y', linestyle=':', alpha=0.6)
-    
+    # پنل ۱: تفکیک توان مصرفی ماژول‌های داخلی شتاب‌دهنده سیلیکونی
+    ax_core.bar(x, p_mac_all, width, label="Compute MACs (INT8)", color="#1d3557", edgecolor='black', linewidth=0.6)
+    ax_core.bar(x, p_reg_all, width, bottom=p_mac_all, label="acc_reg (32-bit Accumulator)", color="#457b9d", edgecolor='black', linewidth=0.6)
+    ax_core.bar(x, p_sram_all, width, bottom=p_mac_all + p_reg_all, label="On-Chip Buffers (IA, W, OA)", color="#2a9d8f", edgecolor='black', linewidth=0.6)
+    ax_core.set_title("On-Chip MMA Core Power Breakdown (Excl. DRAM)", fontsize=11, fontweight='bold', pad=10)
+    ax_core.set_xticks(x)
+    ax_core.set_xticklabels(tech_keys, fontsize=10, fontweight='bold')
+    ax_core.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
+    ax_core.legend(title="Core Modules", fontsize=9, loc='upper left')
+    ax_core.grid(True, axis='y', linestyle=':', alpha=0.6)
+
+    # پنل ۲: مقایسه توان مصرفی کل سیستم (تراشه شتاب‌دهنده در برابر حافظه خارجی)
+    ax_sys.bar(x, p_core_all, width, label="On-Chip Core Power", color="#48cae4", edgecolor='black', linewidth=0.6)
+    ax_sys.bar(x, p_dram_all, width, bottom=p_core_all, label="Off-Chip DRAM / SharedBus", color="#e76f51", edgecolor='black', linewidth=0.6)
+    ax_sys.set_title("Total System Power: Core vs. Off-Chip DRAM", fontsize=11, fontweight='bold', pad=10)
+    ax_sys.set_xticks(x)
+    ax_sys.set_xticklabels(tech_keys, fontsize=10, fontweight='bold')
+    ax_sys.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
+    ax_sys.legend(title="System Domain", fontsize=9, loc='upper left')
+    ax_sys.grid(True, axis='y', linestyle=':', alpha=0.6)
+
     plt.tight_layout()
     plt.savefig(comparison_dir / "tech_power_breakdown_comparison.png", dpi=250)
     plt.close()
