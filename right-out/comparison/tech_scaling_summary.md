@@ -1,0 +1,11 @@
+# Cross-Technology Analytical Evaluation Summary (MMA Accelerator)
+
+Reference Hardware Configuration: Block Trees = 4, Buffer Size = 256 Bytes, Workload = RiskMLP (3 Layers)
+
+| Technology   | PDK                          | Family   |   Voltage_V |   Freq_MHz |   EndToEnd_Latency_us |   EndToEnd_Energy_uJ |   Avg_Power_mW |   Energy_Efficiency_GOPS_W |   Energy_Efficiency_TOPS_W |   Approx_Area_mm2 |
+|:-------------|:-----------------------------|:---------|------------:|-----------:|----------------------:|---------------------:|---------------:|---------------------------:|---------------------------:|------------------:|
+| 2nm          | GT2N 2nm Nanosheet GAAFET    | GAAFET   |         0.7 |       1200 |                1.1367 |              0.02166 |         19.84  |                     442.71 |                    0.44271 |          0.001049 |
+| 7nm          | ASAP7 7.5T Predictive FinFET | FinFET   |         0.7 |       1000 |                1.364  |              0.057   |         43.51  |                     168.23 |                    0.16823 |          0.008394 |
+| 45nm         | NanGate FreePDK45 Open Cell  | Planar   |         1.1 |        500 |                2.728  |              0.57    |        217.548 |                      16.82 |                    0.01682 |          0.209846 |
+| 130nm        | SkyWater SKY130 HD           | Planar   |         1.8 |        200 |                6.82   |              3.876   |        591.731 |                       2.47 |                    0.00247 |          1.74172  |
+| 180nm        | GlobalFoundries GF180MCU 7T  | Planar   |         1.8 |        100 |               13.64   |              8.265   |        630.89  |                       1.16 |                    0.00116 |          3.35754  |

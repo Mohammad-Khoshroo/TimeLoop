@@ -36,14 +36,22 @@ timeloop/
 │   ├── cnn_conv/           # لایه‌های کانولوشن ۷ بعدی و نمونه‌های مدل/ماپر
 │   ├── simba/              # معماری چندچیپلتی سیمبا
 │   └── mma_gemm_accelerator/ # پروژه شتاب‌دهنده MMA و DSE
-├── inputs/                 # پوشه فعال شبیه‌سازی (مبتنی بر معماری GEMM)
-│   ├── architectures/      # gemm_arch.yaml
-│   ├── workloads/          # gemm_ABZ.yaml, gemm_problem.yaml, gemm.cfg
-│   ├── constraints/        # gemm_constraints.yaml
-│   ├── mapper/             # gemm_mapper.yaml
-│   ├── sample_gemm.yaml    # فایل فعال آماده کاوش با timeloop-mapper
-│   └── sample_model_gemm.yaml # فایل فعال آماده ارزیابی با timeloop-model
-├── outputs/                # مقصد پیش‌فرض و خودکار تمامی فایل‌های خروجی
+├── inputs/                 # پوشه فعال شبیه‌سازی (مبتنی بر شتاب‌دهنده سخت‌افزاری MMA و RiskMLP)
+│   ├── architectures/      # arch_mma.yaml
+│   ├── workloads/          # gemm_ABZ.yaml, problem_risk_mlp.yaml
+│   ├── constraints/        # constraints_mma.yaml
+│   ├── mapper/             # mapper_mma.yaml
+│   ├── sample_mma_mapper.yaml # فایل فعال آماده کاوش با timeloop-mapper
+│   ├── sample_mma_model.yaml  # فایل فعال آماده ارزیابی قطعی با timeloop-model
+│   └── run_multi_tech_dse.py  # اسکریپت اجرای شبیه‌سازی جامع ۵ فناوری
+├── right-out/              # آرشیو نتایج و نمودارهای تفکیک‌شده شبیه‌سازی ۵ گره فناوری
+│   ├── 2nm/                # خروجی‌ها، داده‌های CSV و نمودارهای فناوری ۲ نانومتر
+│   ├── 7nm/                # خروجی‌ها، داده‌های CSV و نمودارهای فناوری ۷ نانومتر
+│   ├── 45nm/               # خروجی‌ها، داده‌های CSV و نمودارهای فناوری ۴۵ نانومتر
+│   ├── 130nm/              # خروجی‌ها، داده‌های CSV و نمودارهای فناوری ۱۳۰ نانومتر
+│   ├── 180nm/              # خروجی‌ها، داده‌های CSV و نمودارهای فناوری ۱۸۰ نانومتر
+│   └── comparison/         # جدول جامع و نمودارهای مقایسه عملکرد ۵ فناوری
+├── outputs/                # مقصد پیش‌فرض و خودکار تمامی فایل‌های خروجی تیم‌لوپ
 ├── env/                    # اسکریپت‌های تنظیم محیط شل (setup-env.bash)
 ├── src/                    # سورس‌کد و هدرهای C++17 به صورت متناظر در کنار هم (cpp و hpp)
 ├── SConstruct              # اسکریپت سیستم ساخت SCons مجهز به هوک پاک‌سازی خودکار
@@ -84,17 +92,21 @@ timeloop/
    * **`tech/180nm/`**: فناوری صنعتی ۱۸۰ نانومتری GlobalFoundries GF180MCU.
 
 ### ۳.۴. پوشه فعال ورودی‌ها (`inputs/`)
-پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و به صورت پیش‌فرض با معماری **GEMM** مقداردهی شده است:
-* `inputs/architectures/gemm_arch.yaml`: تعریف ساختار سلسله‌مراتبی حافظه و واحدهای محاسباتی.
-* `inputs/constraints/gemm_constraints.yaml`: قیود نگاشت مکانی و زمانی.
-* `inputs/workloads/`: تعاریف تانسور و ابعاد مسئله (`gemm_ABZ.yaml`, `gemm_problem.yaml`, `gemm.cfg`).
-* `inputs/mapper/gemm_mapper.yaml`: الگوریتم و شرایط خاتمه جستجو.
-* `inputs/sample_gemm.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
-* `inputs/sample_model_gemm.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
+پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و با شتاب‌دهنده سخت‌افزاری **MMA (Matrix Multiplication Accelerator)** و بار کاری مدل **RiskMLP** پیکربندی شده است:
+* `inputs/architectures/arch_mma.yaml`: تعریف ساختار آرایه بلوک‌تری‌ها (BTs)، بافرهای پینگ‌پنگ IA/W/OA و حافظه اصلی.
+* `inputs/constraints/constraints_mma.yaml`: قیود نگاشت مکانی (K=4 و N) و جریان داده خروجی‌ثابت (Output Stationary).
+* `inputs/workloads/`: تعاریف تانسور و ابعاد لایه‌های شبکه (`problem_risk_mlp.yaml`, `gemm_ABZ.yaml`).
+* `inputs/mapper/mapper_mma.yaml`: الگوریتم جستجو، شرایط پیروزی و ثبت نقاط ساب‌اپتیمال.
+* `inputs/sample_mma_mapper.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
+* `inputs/sample_mma_model.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
+* `inputs/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری و استخراج نمودارها.
 
-> **تعویض معماری فعال:** برای ارزیابی هر معماری دیگر، کافیست محتوای پوشه مربوطه از `examples/` در پوشه `inputs/` کپی شود (مثلاً `cp -r examples/eyeriss/* inputs/`).
+### ۳.۵. پوشه خروجی‌های سازمان‌یافته فناوری‌ها (`right-out/`)
+پوشه `right-out/` نتایج تفکیک‌شده شبیه‌سازی DSE را به ازای تک‌تک ۵ فناوری سیلیکونی نگهداری می‌کند:
+* `right-out/2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`: شامل فایل‌های آماری، لاگ‌ها، داده‌های `mma_dse_optimal_summary.csv`، داده‌های `mma_dse_all_evaluated_candidates.csv` و نمودارهای چهارگانه پرتو، فضای سرچ، تفکیک توان و استنتاج فریم.
+* `right-out/comparison/`: شامل فایل مقایسه جامع `tech_scaling_comparison.csv`، نمودار مقایسه ۴ بخشی `tech_scaling_comparison.png` و گزارش مارک‌داون `tech_scaling_summary.md`.
 
-### ۳.۵. پوشه نتایج شبیه‌سازی (`outputs/`)
+### ۳.۶. پوشه نتایج شبیه‌سازی جاری (`outputs/`)
 کلیه ابزارهای اجرایی C++ به گونه‌ای پیکربندی شده‌اند که تمام نتایج را مستقیماً و بدون نیاز به تعیین سوئیچ خط فرمان در پوشه **`outputs/`** تولید می‌کنند:
 * `*.stats.txt`: گزارش تفصیلی مساحت، توان ایستا/پویا، بهره‌وری محاسباتی و چرخه‌ها.
 * `*.map.txt`: بهترین نگاشت مکانی و زمانی حلقه‌ها.
@@ -125,19 +137,24 @@ source env/setup-env.bash
 ```
 این دستور پوشه `runner/` را به `PATH` اضافه کرده، `LD_LIBRARY_PATH` را به `lib/` متصل می‌کند و متغیرهای `TIMELOOP_PROBLEM_SHAPE_DIR` و `TIMELOOP_PROBLEM_SHAPE_DIRS` را به صورت خودکار روی `inputs/workloads` تنظیم می‌نماید.
 
-### ۵.۲. اجرای ارزیابی قطعی GEMM (Model)
+### ۵.۲. اجرای ارزیابی قطعی MMA (Model)
 ```bash
-timeloop-model inputs/sample_model_gemm.yaml
+timeloop-model inputs/sample_mma_model.yaml
 ```
 
-### ۵.۳. اجرای کاوش خودکار نگاشت GEMM (Mapper)
+### ۵.۳. اجرای کاوش خودکار نگاشت MMA (Mapper)
 ```bash
-timeloop-mapper inputs/sample_gemm.yaml
+timeloop-mapper inputs/sample_mma_mapper.yaml
 ```
 
-### ۵.۴. اجرای ماژولار چندفایلی
+### ۵.۴. اجرای شبیه‌سازی چندفناوری و تولید تمامی نمودارها در right-out
 ```bash
-timeloop-mapper inputs/architectures/gemm_arch.yaml inputs/constraints/gemm_constraints.yaml inputs/workloads/gemm_problem.yaml inputs/mapper/gemm_mapper.yaml
+python3 inputs/run_multi_tech_dse.py
+```
+
+### ۵.۵. اجرای ماژولار چندفایلی
+```bash
+timeloop-mapper inputs/architectures/arch_mma.yaml inputs/constraints/constraints_mma.yaml inputs/workloads/problem_risk_mlp.yaml inputs/mapper/mapper_mma.yaml
 ```
 
 ### ۵.۵. اجرای پروژه شتاب‌دهنده MMA و DSE
