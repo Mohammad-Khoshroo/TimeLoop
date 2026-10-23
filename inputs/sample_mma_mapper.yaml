@@ -16,6 +16,7 @@ arch:
     name: MACs
     instances: 16
     meshX: 4
+    meshY: 4
     word-bits: 8
 
   storage:
