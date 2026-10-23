@@ -47,14 +47,14 @@ This repository is maintained across two dedicated branches:
 * **`inputs/`**: Active simulation workspace directory (configured with the hardware MMA accelerator and RiskMLP workload):
   - `sample_mma_mapper.yaml`: Consolidated single-file specification for instant mapping exploration.
   - `sample_mma_model.yaml`: Consolidated single-file specification for deterministic evaluation.
-  - `run_multi_tech_dse.py`: Comprehensive DSE execution script across all 5 semiconductor technology nodes.
+  - `run_multi_tech_dse.py`: Comprehensive DSE execution script across 5 technology nodes and 4 MLP benchmarks.
   - `architectures/`: Modular hardware architecture definitions (`arch_mma.yaml`).
   - `constraints/`: Modular spatial and temporal mapping constraints (`constraints_mma.yaml`).
-  - `workloads/`: Tensor shape and problem dimension specifications (`problem_risk_mlp.yaml`, `gemm_ABZ.yaml`).
+  - `workloads/`: Tensor shape and problem dimension specifications (`problem_risk_mlp.yaml`, `problem_mnist_mlp.yaml`, `problem_har_mlp.yaml`, `problem_dlrm_mlp.yaml`, `gemm_ABZ.yaml`).
   - `mapper/`: Search heuristics and convergence criteria (`mapper_mma.yaml`).
-* **`right-out/`**: Multi-technology simulation outputs and analytical plots categorized by process node:
-  - `2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`: Individual CSV summaries, candidate exploration dumps, XML reports, and 4 high-resolution plots (Pareto, Search Space, Power Breakdown, RiskMLP Execution).
-  - `comparison/`: Cross-technology scaling comparison table (`tech_scaling_summary.md`), CSV dump, and comparative benchmark visualization (`tech_scaling_comparison.png`).
+* **`right-out/`**: Multi-technology simulation outputs and analytical plots categorized by process node and neural network workload:
+  - `2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`: Subdivided into per-model directories (`risk_mlp/`, `mnist_mlp/`, `har_mlp/`, `dlrm_mlp/`) containing Pareto frontiers, search space distributions, dual-panel power breakdowns, and end-to-end execution plots, plus a `models_comparison/` directory benchmark.
+  - `comparison/`: Cross-technology scaling comparison table (`tech_scaling_summary.md`), CSV dump, and comparative benchmark visualizations (`tech_scaling_comparison.png`, `tech_power_breakdown_comparison.png`).
 * **`outputs/`**: All simulation results, performance counters, mappings, XML dumps, and execution logs from direct runs are automatically directed to this directory.
 * **`src/`**: Unified C++ source tree containing both implementation (`.cpp`) and header (`.hpp`) files side-by-side (`master` branch).
 

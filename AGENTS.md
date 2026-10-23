@@ -92,19 +92,24 @@ timeloop/
    * **`tech/180nm/`**: فناوری صنعتی ۱۸۰ نانومتری GlobalFoundries GF180MCU.
 
 ### ۳.۴. پوشه فعال ورودی‌ها (`inputs/`)
-پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و با شتاب‌دهنده سخت‌افزاری **MMA (Matrix Multiplication Accelerator)** و بار کاری مدل **RiskMLP** پیکربندی شده است:
+پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و با شتاب‌دهنده سخت‌افزاری **MMA (Matrix Multiplication Accelerator)** و ۴ مدل بنچمارک شبکه عصبی پرسپترون چندلایه (RiskMLP، MNIST-MLP، HAR-MLP، DLRM-MLP) پیکربندی شده است:
 * `inputs/architectures/arch_mma.yaml`: تعریف ساختار آرایه بلوک‌تری‌ها (BTs)، بافرهای پینگ‌پنگ IA/W/OA و حافظه اصلی.
 * `inputs/constraints/constraints_mma.yaml`: قیود نگاشت مکانی (K=4 و N) و جریان داده خروجی‌ثابت (Output Stationary).
-* `inputs/workloads/`: تعاریف تانسور و ابعاد لایه‌های شبکه (`problem_risk_mlp.yaml`, `gemm_ABZ.yaml`).
+* `inputs/workloads/`: تعاریف تانسور و ابعاد لایه‌های شبکه‌ها (`problem_risk_mlp.yaml`، `problem_mnist_mlp.yaml`، `problem_har_mlp.yaml`، `problem_dlrm_mlp.yaml`، `gemm_ABZ.yaml`).
 * `inputs/mapper/mapper_mma.yaml`: الگوریتم جستجو، شرایط پیروزی و ثبت نقاط ساب‌اپتیمال.
 * `inputs/sample_mma_mapper.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
 * `inputs/sample_mma_model.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
-* `inputs/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری و استخراج نمودارها.
+* `inputs/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری سیلیکونی و ۴ مدل شبکه عصبی و استخراج کلیه نمودارها.
 
 ### ۳.۵. پوشه خروجی‌های سازمان‌یافته فناوری‌ها (`right-out/`)
-پوشه `right-out/` نتایج تفکیک‌شده شبیه‌سازی DSE را به ازای تک‌تک ۵ فناوری سیلیکونی نگهداری می‌کند:
-* `right-out/2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`: شامل فایل‌های آماری، لاگ‌ها، داده‌های `mma_dse_optimal_summary.csv`، داده‌های `mma_dse_all_evaluated_candidates.csv` و نمودارهای چهارگانه پرتو، فضای سرچ، تفکیک توان و استنتاج فریم.
-* `right-out/comparison/`: شامل فایل مقایسه جامع `tech_scaling_comparison.csv`، نمودار مقایسه ۴ بخشی `tech_scaling_comparison.png` و گزارش مارک‌داون `tech_scaling_summary.md`.
+پوشه `right-out/` نتایج تفکیک‌شده شبیه‌سازی DSE را به ازای تک‌تک ۵ فناوری سیلیکونی و به تفکیک ۴ مدل شبکه عصبی نگهداری می‌کند:
+* `right-out/2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`:
+  - `risk_mlp/`: فایل‌های آماری، لاگ‌ها، داده‌های CSV و ۴ نمودار اختصاصی مدل RiskMLP (پرتو، فضای جستجو، تفکیک توان دوپنله، تاخیر و توان عملیاتی).
+  - `mnist_mlp/`: فایل‌های آماری، داده‌های CSV و ۴ نمودار اختصاصی مدل بینایی ماشین MNIST-MLP (LeNet-300-100).
+  - `har_mlp/`: فایل‌های آماری، داده‌های CSV و ۴ نمودار اختصاصی مدل شناسایی فعالیت انسانی HAR-MLP.
+  - `dlrm_mlp/`: فایل‌های آماری، داده‌های CSV و ۴ نمودار اختصاصی مدل سیستم پیشنهاددهنده DLRM-MLP متا.
+  - `models_comparison/`: جدول مقایسه مدل‌ها (`models_comparison.csv`)، نمودار مقایسه نرخ فریم و شتاب موازی‌سازی (`models_scaling_throughput_fps.png`)، نمودار مقایسه مصرف انرژی و توان (`models_energy_power_comparison.png`) و گزارش مارک‌داون `models_summary.md`.
+* `right-out/comparison/`: شامل فایل مقایسه جامع ۵ فناوری `tech_scaling_comparison.csv`، نمودار مقایسه ۴ بخشی `tech_scaling_comparison.png`، نمودار دوپنله تفکیک توان درون‌تراشه‌ای و سیستمی `tech_power_breakdown_comparison.png` و گزارش مارک‌داون `tech_scaling_summary.md`.
 
 ### ۳.۶. پوشه نتایج شبیه‌سازی جاری (`outputs/`)
 کلیه ابزارهای اجرایی C++ به گونه‌ای پیکربندی شده‌اند که تمام نتایج را مستقیماً و بدون نیاز به تعیین سوئیچ خط فرمان در پوشه **`outputs/`** تولید می‌کنند:
