@@ -8,6 +8,7 @@
 import os
 import sys
 import re
+import glob
 import yaml
 import shutil
 import subprocess
@@ -187,7 +188,7 @@ def generate_mapping_config(bt_count, buf_size, layer_spec, output_path):
         yaml.dump(config, f, default_flow_style=False)
 
 def parse_stats_file(stats_path, tech_info, layer_spec):
-    """استخراج آمارهای شبیه‌سازی و اعمال ضرایب مقیاس فناوری"""
+    """استخراج آمارهای شبیه‌سازی، تفکیک سهم اجزای سخت‌افزار و اعمال ضرایب مقیاس فناوری"""
     if not stats_path.exists():
         return None
     
@@ -206,6 +207,25 @@ def parse_stats_file(stats_path, tech_info, layer_spec):
         computes = int(computes_match.group(1))
     else:
         computes = layer_spec["M"] * layer_spec["K"] * layer_spec["N"]
+        
+    # استخراج انرژی تفکیک‌شده اجزای مختلف (MACs, acc_reg, OA_BUF, W_BUF, IA_BUF, DRAM)
+    components_pj = {}
+    levels = re.split(r'Level \d+\n-+\n===\s*', text)
+    for l in levels[1:]:
+        header = l.split("===")[0].strip()
+        stats_sec = l.split("STATS")[-1] if "STATS" in l else l
+        stats_sec = stats_sec.split("Networks")[0].split("Summary stats")[0]
+        matches = re.findall(r'Energy \(total\)\s*:\s*([0-9.]+)\s*pJ', stats_sec)
+        tot_level_pj = sum(float(x) for x in matches)
+        components_pj[header] = tot_level_pj
+        
+    mac_pj = components_pj.get("MACs", 0.0)
+    acc_pj = components_pj.get("acc_reg", 0.0)
+    oa_pj = components_pj.get("OA_BUF", 0.0)
+    w_pj = components_pj.get("W_BUF", 0.0)
+    ia_pj = components_pj.get("IA_BUF", 0.0)
+    dram_pj = components_pj.get("DRAM", 0.0)
+    sram_pj = oa_pj + w_pj + ia_pj
     
     # مقیاس‌بندی انرژی با فناوری مربوطه
     energy_scale = tech_info["energy_scale"]
@@ -217,6 +237,13 @@ def parse_stats_file(stats_path, tech_info, layer_spec):
     latency_us = latency_ns / 1000.0
     
     power_mw = (energy_uj / latency_us) * 1000.0 if latency_us > 0 else 0.0
+    
+    # توان تفکیک‌شده به میلی‌وات (P = E / T):
+    # E(pJ) * 1e-12 J / (latency_us * 1e-6 s) = (E_pJ / latency_us) * 1e-6 W = (E_pJ / latency_us) * 1e-3 mW
+    power_mac_mw = (mac_pj * energy_scale / latency_us) * 1e-3 if latency_us > 0 else 0.0
+    power_reg_mw = (acc_pj * energy_scale / latency_us) * 1e-3 if latency_us > 0 else 0.0
+    power_sram_mw = (sram_pj * energy_scale / latency_us) * 1e-3 if latency_us > 0 else 0.0
+    power_dram_mw = (dram_pj * energy_scale / latency_us) * 1e-3 if latency_us > 0 else 0.0
     
     # کارایی انرژی به GOPS/W و TOPS/W
     total_ops = 2.0 * computes
@@ -232,6 +259,10 @@ def parse_stats_file(stats_path, tech_info, layer_spec):
         "energy_uJ": round(energy_uj, 6),
         "latency_us": round(latency_us, 4),
         "power_mW": round(power_mw, 3),
+        "power_mac_mW": round(power_mac_mw, 3),
+        "power_reg_mW": round(power_reg_mw, 3),
+        "power_sram_mW": round(power_sram_mw, 3),
+        "power_dram_mW": round(power_dram_mw, 3),
         "utilization": utilization,
         "computes": computes,
         "gops_per_w": round(gops_per_w, 2),
@@ -250,7 +281,6 @@ def parse_candidates(log_path, bt_count, buf_size, layer_name, computes, tech_in
     num_macs = bt_count * 4
     energy_scale = tech_info["energy_scale"]
     
-    # الگوی تطبیق خروجی لاگ تیم‌لوپ برای هر کاندید
     pattern = re.compile(r'\[\s*\d+\]\s+Utilization\s*=\s*([0-9.]+)%?\s*\|\s*pJ/Compute\s*=\s*([0-9.]+)')
     
     with open(log_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -279,7 +309,7 @@ def parse_candidates(log_path, bt_count, buf_size, layer_name, computes, tech_in
     return candidates
 
 def generate_tech_plots(df_opt, df_cands, tech_key, tech_info, output_dir):
-    """رسم نمودارهای کامل برای هر فناوری"""
+    """رسم نمودارهای کامل شامل نمودار تفکیک انباشته توان هر بخش سخت‌افزار"""
     output_dir.mkdir(parents=True, exist_ok=True)
     
     # ۱. نمودار پرتو (Pareto Frontier)
@@ -343,21 +373,31 @@ def generate_tech_plots(df_opt, df_cands, tech_key, tech_info, output_dir):
     plt.savefig(output_dir / "mma_dse_search_space.png", dpi=250)
     plt.close()
         
-    # ۳. نمودار تفکیک توان لایه‌ها
-    fig, ax = plt.subplots(figsize=(10, 5))
+    # ۳. نمودار تفکیک انباشته توان مصرفی اجزا (Stacked Power Breakdown)
+    fig, ax = plt.subplots(figsize=(12, 6))
     sub = df_opt[df_opt["buf_size_B"] == 256].copy()
     if sub.empty:
         sub = df_opt.copy()
     labels = [f"{row['layer'].split('_')[0]}\nBT={row['bt_count']}" for _, row in sub.iterrows()]
     x = np.arange(len(labels))
-    p_tot = sub["power_mW"].values
+    width = 0.55
     
-    ax.bar(x, p_tot, 0.55, color="#1f77b4", edgecolor='black', alpha=0.85)
-    ax.set_title(f"Power Dissipation across Hardware Configurations ({tech_info['name']})", fontsize=11, fontweight='bold')
+    p_mac = sub["power_mac_mW"].values
+    p_reg = sub["power_reg_mW"].values
+    p_sram = sub["power_sram_mW"].values
+    p_dram = sub["power_dram_mW"].values
+    
+    ax.bar(x, p_mac, width, label="Compute MACs (INT8)", color="#2b5c8f", edgecolor='black', linewidth=0.5)
+    ax.bar(x, p_reg, width, bottom=p_mac, label="acc_reg (32-bit Accumulator)", color="#4682b4", edgecolor='black', linewidth=0.5)
+    ax.bar(x, p_sram, width, bottom=p_mac + p_reg, label="On-Chip Buffers (IA, W, OA)", color="#48d1cc", edgecolor='black', linewidth=0.5)
+    ax.bar(x, p_dram, width, bottom=p_mac + p_reg + p_sram, label="DRAM / SharedBus", color="#e76f51", edgecolor='black', linewidth=0.5)
+    
+    ax.set_title(f"Hardware Module Power Breakdown (mW) - {tech_info['name']}", fontsize=12, fontweight='bold', pad=12)
     ax.set_xlabel("Workload Layer & BT Configuration", fontsize=10, fontweight='bold')
-    ax.set_ylabel("Power (mW)", fontsize=10, fontweight='bold')
+    ax.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
     ax.set_xticks(x)
     ax.set_xticklabels(labels, fontsize=8)
+    ax.legend(title="Hardware Component", fontsize=9, loc='upper right')
     ax.grid(True, axis='y', linestyle=':', alpha=0.6)
     
     plt.tight_layout()
@@ -410,6 +450,10 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
             "latency_us": "sum",
             "energy_uJ": "sum",
             "power_mW": "mean",
+            "power_mac_mW": "mean",
+            "power_reg_mW": "mean",
+            "power_sram_mW": "mean",
+            "power_dram_mW": "mean",
             "gops_per_w": "mean",
             "tops_per_w": "mean",
             "area_mm2": "mean"
@@ -430,6 +474,10 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
             "EndToEnd_Latency_us": round(r["latency_us"], 4),
             "EndToEnd_Energy_uJ": round(r["energy_uJ"], 6),
             "Avg_Power_mW": round(r["power_mW"], 3),
+            "MAC_Power_mW": round(r["power_mac_mW"], 3),
+            "AccReg_Power_mW": round(r["power_reg_mW"], 3),
+            "SRAM_Power_mW": round(r["power_sram_mW"], 3),
+            "DRAM_Power_mW": round(r["power_dram_mW"], 3),
             "Energy_Efficiency_GOPS_W": round(r["gops_per_w"], 2),
             "Energy_Efficiency_TOPS_W": round(r["tops_per_w"], 5),
             "Approx_Area_mm2": round(r["area_mm2"], 6)
@@ -438,12 +486,12 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
     comp_df = pd.DataFrame(rows)
     comp_df.to_csv(comparison_dir / "tech_scaling_comparison.csv", index=False)
     
-    # رسم نمودار جامع ۴ بخشی مقایسه فناوری‌ها
+    # ۱. نمودار جامع ۴ بخشی مقایسه فناوری‌ها
     fig, axes = plt.subplots(2, 2, figsize=(14, 10))
     x = np.arange(len(tech_keys))
     colors = ["#2b5c8f", "#3a86c8", "#48bfe3", "#f4a261", "#e76f51"]
     
-    # ۱. مقایسه تاخیر استنتاج (Latency)
+    # تاخیر استنتاج (Latency)
     axes[0, 0].bar(x, comp_df["EndToEnd_Latency_us"], color=colors, edgecolor='black', alpha=0.85)
     axes[0, 0].set_title("End-to-End Latency Comparison (μs)", fontsize=11, fontweight='bold')
     axes[0, 0].set_xticks(x)
@@ -451,7 +499,7 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
     axes[0, 0].set_ylabel("Latency (μs)", fontsize=10)
     axes[0, 0].grid(True, axis='y', linestyle=':', alpha=0.6)
     
-    # ۲. مقایسه مصرف انرژی به ازای هر فریم (Energy)
+    # مصرف انرژی کل (Energy)
     axes[0, 1].bar(x, comp_df["EndToEnd_Energy_uJ"], color=colors, edgecolor='black', alpha=0.85)
     axes[0, 1].set_yscale('log')
     axes[0, 1].set_title("Total Energy per Inference (μJ - Log Scale)", fontsize=11, fontweight='bold')
@@ -460,7 +508,7 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
     axes[0, 1].set_ylabel("Energy (μJ)", fontsize=10)
     axes[0, 1].grid(True, axis='y', linestyle=':', alpha=0.6)
     
-    # ۳. کارایی انرژی (GOPS/W)
+    # کارایی انرژی (GOPS/W)
     axes[1, 0].bar(x, comp_df["Energy_Efficiency_GOPS_W"], color=colors, edgecolor='black', alpha=0.85)
     axes[1, 0].set_yscale('log')
     axes[1, 0].set_title("Energy Efficiency (GOPS/W - Log Scale)", fontsize=11, fontweight='bold')
@@ -469,7 +517,7 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
     axes[1, 0].set_ylabel("GOPS / Watt", fontsize=10)
     axes[1, 0].grid(True, axis='y', linestyle=':', alpha=0.6)
     
-    # ۴. مساحت تقریبی سیلیکون (Silicon Area)
+    # مساحت تقریبی سیلیکون (Silicon Area)
     axes[1, 1].bar(x, comp_df["Approx_Area_mm2"], color=colors, edgecolor='black', alpha=0.85)
     axes[1, 1].set_yscale('log')
     axes[1, 1].set_title("Silicon Area Scaling (mm² - Log Scale)", fontsize=11, fontweight='bold')
@@ -483,6 +531,30 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
     plt.savefig(comparison_dir / "tech_scaling_comparison.png", dpi=250)
     plt.close()
     
+    # ۲. نمودار مقایسه انباشته تفکیک توان مصرفی در میان فناوری‌ها
+    fig, ax = plt.subplots(figsize=(10, 6))
+    width = 0.5
+    p_mac_all = comp_df["MAC_Power_mW"].values
+    p_reg_all = comp_df["AccReg_Power_mW"].values
+    p_sram_all = comp_df["SRAM_Power_mW"].values
+    p_dram_all = comp_df["DRAM_Power_mW"].values
+    
+    ax.bar(x, p_mac_all, width, label="Compute MACs (INT8)", color="#2b5c8f", edgecolor='black', linewidth=0.6)
+    ax.bar(x, p_reg_all, width, bottom=p_mac_all, label="acc_reg (32-bit Accumulator)", color="#4682b4", edgecolor='black', linewidth=0.6)
+    ax.bar(x, p_sram_all, width, bottom=p_mac_all + p_reg_all, label="On-Chip Buffers (IA, W, OA)", color="#48d1cc", edgecolor='black', linewidth=0.6)
+    ax.bar(x, p_dram_all, width, bottom=p_mac_all + p_reg_all + p_sram_all, label="DRAM / SharedBus", color="#e76f51", edgecolor='black', linewidth=0.6)
+    
+    ax.set_title("Average Power Breakdown across Process Technology Nodes (mW)", fontsize=12, fontweight='bold', pad=12)
+    ax.set_xticks(x)
+    ax.set_xticklabels(tech_keys, fontsize=10, fontweight='bold')
+    ax.set_ylabel("Power Consumption (mW)", fontsize=10, fontweight='bold')
+    ax.legend(title="Hardware Module", fontsize=9, loc='upper left')
+    ax.grid(True, axis='y', linestyle=':', alpha=0.6)
+    
+    plt.tight_layout()
+    plt.savefig(comparison_dir / "tech_power_breakdown_comparison.png", dpi=250)
+    plt.close()
+    
     # ذخیره گزارش متنی مارک‌داون
     report_md = comparison_dir / "tech_scaling_summary.md"
     with open(report_md, "w", encoding="utf-8") as f:
@@ -491,6 +563,20 @@ def generate_cross_technology_comparison(all_tech_summaries, comparison_dir):
         f.write(comp_df.to_markdown(index=False))
         f.write("\n")
     print(f"✔ مقایسه فناوری‌ها ذخیره شد: {comparison_dir}")
+
+def clean_outputs_directory():
+    """پاک‌سازی تمامی فایل‌های موقت تولیدشده در outputs/ به جز gitkeep"""
+    outputs_dir = REPO_DIR / "outputs"
+    for item in outputs_dir.iterdir():
+        if item.name == ".gitkeep":
+            continue
+        try:
+            if item.is_file() or item.is_symlink():
+                item.unlink()
+            elif item.is_dir():
+                shutil.rmtree(item, ignore_errors=True)
+        except Exception as e:
+            pass
 
 def main():
     print("=" * 80)
@@ -580,15 +666,18 @@ def main():
                 
         # تولید نمودارهای این فناوری
         generate_tech_plots(df_opt, df_cands, tech_key, tech_info, tech_out_dir)
-        print(f"✔ نتایج ({len(df_opt)} بهینه و {len(df_cands)} کاندید) و نمودارهای {tech_key} در {tech_out_dir} مستقر شد.")
+        print(f"✔ نتایج و نمودارهای {tech_key} در {tech_out_dir} مستقر شد.")
         
     # مرحله ۳: مقایسه جامع بین فناوری‌ها
     print("\n📊 تولید گزارش و نمودارهای مقایسه جامع چندفناوری...")
     generate_cross_technology_comparison(all_tech_summaries, RIGHT_OUT_DIR / "comparison")
     
-    # پاک‌سازی فایل‌های موقت
-    shutil.rmtree(temp_work_dir, ignore_errors=True)
-    print("\n🎉 تمامی مراحل شبیه‌سازی چندفناوری و تولید نمودارها با موفقیت به پایان رسید.")
+    # مرحله ۴: پاک‌سازی تمیز و کامل پوشه موقت outputs/
+    print("\n🧹 پاک‌سازی کامل فایل‌های موقت در outputs/ ...")
+    clean_outputs_directory()
+    print("✔ پوشه outputs/ کاملاً تمیز شد.")
+    
+    print("\n🎉 تمامی مراحل شبیه‌سازی چندفناوری، تفکیک سهم توان اجزا و تولید نمودارها با موفقیت به پایان رسید.")
 
 if __name__ == "__main__":
     main()
