@@ -1,0 +1,97 @@
+# ==============================================================================
+# Accelergy Compound Components for MMA GEMM Accelerator
+# Multi-Node Technology Standard Definitions
+# ==============================================================================
+
+compound_components:
+  version: 0.4
+  classes:
+  - name: mma_dram
+    attributes:
+      technology: "must_specify"
+      type: "LPDDR4"
+      width: 64
+      block_size: 16
+      word_bits: 8
+      global_cycle_seconds: 1e-09
+    subcomponents:
+    - name: dram_core
+      class: DRAM
+      attributes:
+        type: type
+        width: width
+    actions:
+    - name: read
+      subcomponents:
+      - name: dram_core
+        actions: [{name: read}]
+    - name: write
+      subcomponents:
+      - name: dram_core
+        actions: [{name: write}]
+    - name: update
+      subcomponents:
+      - name: dram_core
+        actions: [{name: update}]
+    - name: leak
+      subcomponents:
+      - name: dram_core
+        actions: [{name: leak}]
+
+  - name: mma_mac
+    attributes:
+      technology: "must_specify"
+      datawidth: 8
+      global_cycle_seconds: 1e-09
+    subcomponents:
+    - name: mac_core
+      class: intmac
+      attributes:
+        technology: technology
+        width: datawidth
+        global_cycle_seconds: global_cycle_seconds
+    actions:
+    - name: compute
+      subcomponents:
+      - name: mac_core
+        actions: [{name: access}]
+    - name: mac_random
+      subcomponents:
+      - name: mac_core
+        actions: [{name: access}]
+    - name: leak
+      subcomponents:
+      - name: mac_core
+        actions: [{name: leak}]
+
+  - name: mma_regfile
+    attributes:
+      technology: "must_specify"
+      width: 32
+      depth: 1
+      global_cycle_seconds: 1e-09
+    subcomponents:
+    - name: rf
+      class: regfile
+      attributes:
+        technology: technology
+        width: width
+        depth: depth
+        global_cycle_seconds: global_cycle_seconds
+    actions:
+    - name: write
+      subcomponents:
+      - name: rf
+        actions: [{name: write}]
+    - name: read
+      subcomponents:
+      - name: rf
+        actions: [{name: read}]
+    - name: update
+      subcomponents:
+      - name: rf
+        actions: [{name: write}]
+    - name: leak
+      subcomponents:
+      - name: rf
+        actions: [{name: leak}]

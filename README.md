@@ -45,9 +45,11 @@ This repository is maintained across two dedicated branches:
   - **`simba/`**: NVIDIA Simba multi-chiplet accelerator architecture specification.
   - **`mma_gemm_accelerator/`**: Dedicated MMA hardware accelerator project, RiskMLP neural network layers, and automated DSE suite.
 * **`inputs/`**: Active simulation workspace directory (configured with the hardware MMA accelerator and RiskMLP workload):
-  - `sample_mma_mapper.yaml`: Consolidated single-file specification for instant mapping exploration.
-  - `sample_mma_model.yaml`: Consolidated single-file specification for deterministic evaluation.
-  - `run_multi_tech_dse.py`: Comprehensive DSE execution script across 5 technology nodes and 4 MLP benchmarks.
+  - `sample_mma_mapper.yaml`: Consolidated single-file specification for instant mapping exploration with integrated Accelergy ERT/ART tables.
+  - `sample_mma_model.yaml`: Consolidated single-file specification for deterministic evaluation with integrated Accelergy ERT/ART tables.
+  - `run_multi_tech_dse.py`: Comprehensive DSE execution script across 5 technology nodes and 4 MLP benchmarks powered 100% by Accelergy.
+  - `components/`: Standard Accelergy compound component templates (`smartbuffer_SRAM.yaml`, `mma_components.yaml`).
+  - `cached_tables/`: Baseline Energy and Area Reference Tables (ERT/ART) eliminating legacy PAT estimation.
   - `architectures/`: Modular hardware architecture definitions (`arch_mma.yaml`).
   - `constraints/`: Modular spatial and temporal mapping constraints (`constraints_mma.yaml`).
   - `workloads/`: Tensor shape and problem dimension specifications (`problem_risk_mlp.yaml`, `problem_mnist_mlp.yaml`, `problem_har_mlp.yaml`, `problem_dlrm_mlp.yaml`, `gemm_ABZ.yaml`).
