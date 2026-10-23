@@ -32,7 +32,12 @@ This repository is maintained across two dedicated branches:
 
 * **`runner/`**: Consolidated directory containing precompiled simulation executables (`looptree-model`, `timeloop-mapper`, `timeloop-model`, `timeloop-metrics`, `timeloop-design-space`, `timeloop-simple-mapper`, `einsumgraph`).
 * **`lib/`**: Dynamic shared libraries (`libtimeloop-model.so`, `libtimeloop-mapper.so`).
-* **`tech/`**: Semiconductor technology characterization libraries (Nangate 45nm LEF/Liberty/Verilog in `tech/45nm/`).
+* **`tech/`**: Multi-node semiconductor standard cell and technology characterization libraries (LEF, Tech LEF, Liberty, Verilog):
+  - **`tech/2nm/`**: Georgia Tech GT2N 2nm Nanosheet GAAFET PDK.
+  - **`tech/7nm/`**: ASU / ARM ASAP7 7.5T Predictive FinFET library.
+  - **`tech/45nm/`**: NanGate FreePDK45 open cell library (typical, fast, slow corners).
+  - **`tech/130nm/`**: SkyWater SKY130 High-Density (HD) planar CMOS library.
+  - **`tech/180nm/`**: GlobalFoundries GF180MCU 7-track planar CMOS library.
 * **`examples/`**: Reference archive of preconfigured accelerator architectures and workloads:
   - **`gemm/`**: General Matrix Multiply accelerator architecture, constraints, workloads, and unified sample configurations.
   - **`eyeriss/`**: Eyeriss 256/1024-PE spatial array specifications, split problem layers, and Accelergy configurations.
