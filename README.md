@@ -23,7 +23,7 @@ This repository is maintained across two dedicated branches:
      git clone -b user https://github.com/Mohammad-Khoshroo/TimeLoop.git timeloop-user
      cd timeloop-user
      source env/setup-env.bash
-     timeloop-model inputs/sample_model_gemm.yaml
+     timeloop-model inputs/sample_mma_model.yaml
      ```
 
 ---
@@ -44,17 +44,19 @@ This repository is maintained across two dedicated branches:
   - **`cnn_conv/`**: 7D CNN convolution layers, ASPLOS 2014 benchmarks, and mapper/model templates.
   - **`simba/`**: NVIDIA Simba multi-chiplet accelerator architecture specification.
   - **`mma_gemm_accelerator/`**: Dedicated MMA hardware accelerator project, RiskMLP neural network layers, and automated DSE suite.
-* **`inputs/`**: Active simulation workspace directory (configured by default with the GEMM accelerator):
-  - `sample_gemm.yaml`: Consolidated single-file specification for instant mapping exploration.
-  - `sample_model_gemm.yaml`: Consolidated single-file specification for deterministic evaluation.
-  - `architectures/`: Modular hardware architecture definitions.
-  - `constraints/`: Modular spatial and temporal mapping constraints.
-  - `workloads/`: Tensor shape and problem dimension specifications.
-  - `mapper/`: Search heuristics and convergence criteria.
-* **`outputs/`**: All simulation results, performance counters, mappings, XML dumps, and execution logs are automatically directed to this directory.
+* **`inputs/`**: Active simulation workspace directory (configured with the hardware MMA accelerator and RiskMLP workload):
+  - `sample_mma_mapper.yaml`: Consolidated single-file specification for instant mapping exploration.
+  - `sample_mma_model.yaml`: Consolidated single-file specification for deterministic evaluation.
+  - `run_multi_tech_dse.py`: Comprehensive DSE execution script across all 5 semiconductor technology nodes.
+  - `architectures/`: Modular hardware architecture definitions (`arch_mma.yaml`).
+  - `constraints/`: Modular spatial and temporal mapping constraints (`constraints_mma.yaml`).
+  - `workloads/`: Tensor shape and problem dimension specifications (`problem_risk_mlp.yaml`, `gemm_ABZ.yaml`).
+  - `mapper/`: Search heuristics and convergence criteria (`mapper_mma.yaml`).
+* **`right-out/`**: Multi-technology simulation outputs and analytical plots categorized by process node:
+  - `2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`: Individual CSV summaries, candidate exploration dumps, XML reports, and 4 high-resolution plots (Pareto, Search Space, Power Breakdown, RiskMLP Execution).
+  - `comparison/`: Cross-technology scaling comparison table (`tech_scaling_summary.md`), CSV dump, and comparative benchmark visualization (`tech_scaling_comparison.png`).
+* **`outputs/`**: All simulation results, performance counters, mappings, XML dumps, and execution logs from direct runs are automatically directed to this directory.
 * **`src/`**: Unified C++ source tree containing both implementation (`.cpp`) and header (`.hpp`) files side-by-side (`master` branch).
-
-> **Switching Active Architecture:** To evaluate any other accelerator model, copy its files from `examples/<model>/*` into `inputs/` (e.g. `cp -r examples/eyeriss/* inputs/`).
 
 ---
 
@@ -118,23 +120,29 @@ Upon a successful build:
 ### Deterministic Architecture Evaluation (`timeloop-model`)
 ```bash
 source env/setup-env.bash
-timeloop-model inputs/sample_model_gemm.yaml
+timeloop-model inputs/sample_mma_model.yaml
 ```
 
 ### Optimal Mapping Exploration (`timeloop-mapper`)
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/sample_gemm.yaml
+timeloop-mapper inputs/sample_mma_mapper.yaml
+```
+
+### Multi-Technology DSE and Plot Generation
+```bash
+source env/setup-env.bash
+python3 inputs/run_multi_tech_dse.py
 ```
 
 ### Modular Multi-File Exploration
 ```bash
 source env/setup-env.bash
 timeloop-mapper \
-    inputs/architectures/gemm_arch.yaml \
-    inputs/constraints/gemm_constraints.yaml \
-    inputs/workloads/gemm_problem.yaml \
-    inputs/mapper/gemm_mapper.yaml
+    inputs/architectures/arch_mma.yaml \
+    inputs/constraints/constraints_mma.yaml \
+    inputs/workloads/problem_risk_mlp.yaml \
+    inputs/mapper/mapper_mma.yaml
 ```
 
 ### Running Archived Examples
