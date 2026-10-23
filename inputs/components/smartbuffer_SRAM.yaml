@@ -1,0 +1,38 @@
+compound_components:
+  version: 0.4
+  classes:
+  - name: smartbuffer_SRAM
+    attributes:
+      technology: "must_specify"
+      width: "must_specify"
+      depth: "must_specify"
+      n_rw_ports: 1
+      global_cycle_seconds: 1e-09
+
+    subcomponents:
+    - name: storage
+      class: SRAM
+      attributes:
+        width: width
+        depth: depth
+        n_rw_ports: n_rw_ports
+        technology: technology
+        global_cycle_seconds: global_cycle_seconds
+
+    actions:
+    - name: write
+      subcomponents:
+      - name: storage
+        actions: [{name: write}]
+    - name: read
+      subcomponents:
+      - name: storage
+        actions: [{name: read}]
+    - name: leak
+      subcomponents:
+      - name: storage
+        actions: [{name: leak}]
+    - name: update
+      subcomponents:
+      - name: storage
+        actions: [{name: write}]
