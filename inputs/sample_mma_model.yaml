@@ -1,10 +1,14 @@
-# Deterministic Evaluation Configuration for GEMM on Spatial MMA Array
+# ==============================================================================
+# فایل نمونه ارزیابی تحلیلی قطعی شتاب‌دهنده MMA برای شبکه RiskMLP با timeloop-model
+# Deterministic Analytical Evaluation of MMA GEMM Accelerator for RiskMLP
+# ==============================================================================
 
 arch:
   arithmetic:
     name: MACs
     instances: 16
     meshX: 4
+    meshY: 4
     word-bits: 8
 
   storage:
@@ -79,8 +83,7 @@ mapping:
       - A
       - B
       - Z
-    bypass:
-      []
+    bypass: []
   - target: acc_reg
     type: spatial
     factors: M1 N1 K4
