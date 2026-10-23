@@ -1,5 +1,5 @@
-Model,Description,Latency_BT2_us,Latency_BT16_us,Throughput_BT2_FPS,Throughput_BT16_FPS,Speedup_BT16_vs_BT2,Energy_per_Frame_uJ,Core_Power_mW,Total_Power_mW
-RiskMLP,RiskMLP (Automotive Risk Estimation),41.4,41.4,24154.6,24154.6,1.0,24.795,7.845,585.58
-MNIST-MLP,MNIST-MLP (LeNet-300-100 Benchmark),1271.44,1271.44,786.5,786.5,1.0,748.635,7.642,588.32
-HAR-MLP,HAR-MLP (Human Activity Recognition),983.6,983.6,1016.7,1016.7,1.0,579.42,7.645,588.39
-DLRM-MLP,DLRM-MLP (Meta Recommendation Bottom MLP),1296.96,1296.96,771.0,771.0,1.0,764.15,7.695,590.47
+Model,Full_Name,Total_Parameters,Total_MAC_Operations,Latency_BT2_us,Latency_BT16_us,Throughput_BT2_FPS,Throughput_BT16_FPS,Speedup_BT16_vs_BT2,Energy_per_Frame_uJ,Core_Power_mW,Total_Power_mW
+RiskMLP,RiskMLP (Automotive Risk Estimation),5376,5376,41.4,41.4,24154.6,24154.6,1.0,1.11,13.508,26.28
+MNIST-MLP,MNIST-MLP (LeNet-300-100 Benchmark),235520,235520,1271.44,1271.44,786.5,786.5,1.0,48.75,23.544,36.5
+HAR-MLP,HAR-MLP (Human Activity Recognition),178176,178176,983.6,983.6,1016.7,1016.7,1.0,37.54,23.546,36.5
+DLRM-MLP,DLRM-MLP (Meta Recommendation Bottom MLP),172032,172032,1296.96,1296.96,771.0,771.0,1.0,46.41,22.942,35.77

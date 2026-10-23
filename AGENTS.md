@@ -12,7 +12,7 @@
 * **نسخه فعال در مخزن:**
   - ارتقایافته به آخرین نسخه پایدار **LoopTree (Timeloop v3.0)** بر پایه شاخه رسمی `master` انویدیا (NVlabs).
   - مجهز به موتور تحلیل هندسی ISL و انتگرال‌گیری شمارشی چندضلعی با کتابخانه‌های `NTL` و `Barvinok 0.41.6` جهت پشتیبانی از بارهای کاری فیوزشده (Fused Layers) و استفاده مجدد تانسورها در میان لایه‌ها (Cross-layer Data Reuse).
-  - متصل به فریم‌ورک تخمین توان، انرژی و مساحت سیلیکون **Accelergy** به همراه پلاگین‌های CACTI و جداول تکنولوژی ۴۵ نانومتر Nangate.
+  - مجهز به فریم‌ورک استاندارد تخمین توان، انرژی و مساحت سیلیکون **Accelergy** به همراه پلاگین‌های CACTI و Aladdin (با مقیاس‌پذیری ۵ گره فناوری)، و جایگزینی کامل مدل‌های تحلیلی قدیمی PAT با جداول مرجع ERT و ART.
 
 ---
 
@@ -41,9 +41,11 @@ timeloop/
 │   ├── workloads/          # gemm_ABZ.yaml, problem_risk_mlp.yaml
 │   ├── constraints/        # constraints_mma.yaml
 │   ├── mapper/             # mapper_mma.yaml
-│   ├── sample_mma_mapper.yaml # فایل فعال آماده کاوش با timeloop-mapper
-│   ├── sample_mma_model.yaml  # فایل فعال آماده ارزیابی قطعی با timeloop-model
-│   └── run_multi_tech_dse.py  # اسکریپت اجرای شبیه‌سازی جامع ۵ فناوری
+│   ├── components/         # تعاریف کامپوننت‌های استاندارد سطح بالای Accelergy
+│   ├── cached_tables/      # جداول مرجع پایه‌ای ERT و ART استخراج‌شده از Accelergy
+│   ├── sample_mma_mapper.yaml # فایل فعال آماده کاوش با timeloop-mapper و جداول Accelergy
+│   ├── sample_mma_model.yaml  # فایل فعال آماده ارزیابی قطعی با timeloop-model و جداول Accelergy
+│   └── run_multi_tech_dse.py  # اسکریپت اجرای شبیه‌سازی جامع ۵ فناوری مبتنی بر ۱۰۰٪ Accelergy
 ├── right-out/              # آرشیو نتایج و نمودارهای تفکیک‌شده شبیه‌سازی ۵ گره فناوری
 │   ├── 2nm/                # خروجی‌ها، داده‌های CSV و نمودارهای فناوری ۲ نانومتر
 │   ├── 7nm/                # خروجی‌ها، داده‌های CSV و نمودارهای فناوری ۷ نانومتر
@@ -97,9 +99,11 @@ timeloop/
 * `inputs/constraints/constraints_mma.yaml`: قیود نگاشت مکانی (K=4 و N) و جریان داده خروجی‌ثابت (Output Stationary).
 * `inputs/workloads/`: تعاریف تانسور و ابعاد لایه‌های شبکه‌ها (`problem_risk_mlp.yaml`، `problem_mnist_mlp.yaml`، `problem_har_mlp.yaml`، `problem_dlrm_mlp.yaml`، `gemm_ABZ.yaml`).
 * `inputs/mapper/mapper_mma.yaml`: الگوریتم جستجو، شرایط پیروزی و ثبت نقاط ساب‌اپتیمال.
-* `inputs/sample_mma_mapper.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
-* `inputs/sample_mma_model.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
-* `inputs/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری سیلیکونی و ۴ مدل شبکه عصبی و استخراج کلیه نمودارها.
+* `inputs/components/`: تعاریف کامپوننت‌های سطح بالای استاندارد Accelergy (`smartbuffer_SRAM.yaml` و `mma_components.yaml`).
+* `inputs/cached_tables/`: جداول مرجع پایه انرژی (ERT) و مساحت (ART) مشتق‌شده از Accelergy برای اجرای مستقل و حذف قطعی مدل PAT.
+* `inputs/sample_mma_mapper.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر مجهز به جداول Accelergy ERT/ART با یک دستور.
+* `inputs/sample_mma_model.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل مجهز به جداول Accelergy ERT/ART با یک دستور.
+* `inputs/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری سیلیکونی و ۴ مدل شبکه عصبی مبتنی بر ۱۰۰٪ Accelergy و استخراج کلیه نمودارها.
 
 ### ۳.۵. پوشه خروجی‌های سازمان‌یافته فناوری‌ها (`right-out/`)
 پوشه `right-out/` نتایج تفکیک‌شده شبیه‌سازی DSE را به ازای تک‌تک ۵ فناوری سیلیکونی و به تفکیک ۴ مدل شبکه عصبی نگهداری می‌کند:

@@ -1,0 +1,15 @@
+ART:
+    version: '0.4'
+    tables:
+      - name: system.MMA_core.BT[0..3].W_BUF
+        area: 857.972
+      - name: system.MMA_core.BT[0..3].OA_BUF
+        area: 1055.36
+      - name: system.MMA_core.BT[0..3].acc_reg
+        area: 5.98
+      - name: system.MMA_core.BT[0..3].MACs[0..3]
+        area: 366.0
+      - name: system.MMA_core.IA_BUF
+        area: 857.972
+      - name: system.DRAM
+        area: 0.0

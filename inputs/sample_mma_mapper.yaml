@@ -105,3 +105,102 @@ problem:
   M: 1
   K: 16
   N: 64
+ERT:
+    version: '0.4'
+    tables:
+      - name: system.MMA_core.BT[0..3].W_BUF
+        actions:
+          - name: write
+            arguments: {}
+            energy: 0.981103
+          - name: read
+            arguments: {}
+            energy: 0.628772
+          - name: leak
+            arguments: {}
+            energy: 1.7658e-05
+          - name: update
+            arguments: {}
+            energy: 0.981103
+      - name: system.MMA_core.BT[0..3].OA_BUF
+        actions:
+          - name: write
+            arguments: {}
+            energy: 1.10514
+          - name: read
+            arguments: {}
+            energy: 0.671565
+          - name: leak
+            arguments: {}
+            energy: 2.33182e-05
+          - name: update
+            arguments: {}
+            energy: 1.10514
+      - name: system.MMA_core.BT[0..3].acc_reg
+        actions:
+          - name: write
+            arguments: {}
+            energy: 0.00901
+          - name: read
+            arguments: {}
+            energy: 0.00901
+          - name: update
+            arguments: {}
+            energy: 0.00901
+          - name: leak
+            arguments: {}
+            energy: 0.00015
+      - name: system.MMA_core.BT[0..3].MACs[0..3]
+        actions:
+          - name: compute
+            arguments: {}
+            energy: 0.618325
+          - name: mac_random
+            arguments: {}
+            energy: 0.618325
+          - name: leak
+            arguments: {}
+            energy: 0.00745
+      - name: system.MMA_core.IA_BUF
+        actions:
+          - name: write
+            arguments: {}
+            energy: 0.981103
+          - name: read
+            arguments: {}
+            energy: 0.628772
+          - name: leak
+            arguments: {}
+            energy: 1.7658e-05
+          - name: update
+            arguments: {}
+            energy: 0.981103
+      - name: system.DRAM
+        actions:
+          - name: read
+            arguments: {}
+            energy: 512.0
+          - name: write
+            arguments: {}
+            energy: 512.0
+          - name: update
+            arguments: {}
+            energy: 512.0
+          - name: leak
+            arguments: {}
+            energy: 0.0
+ART:
+    version: '0.4'
+    tables:
+      - name: system.MMA_core.BT[0..3].W_BUF
+        area: 857.972
+      - name: system.MMA_core.BT[0..3].OA_BUF
+        area: 1055.36
+      - name: system.MMA_core.BT[0..3].acc_reg
+        area: 5.98
+      - name: system.MMA_core.BT[0..3].MACs[0..3]
+        area: 366.0
+      - name: system.MMA_core.IA_BUF
+        area: 857.972
+      - name: system.DRAM
+        area: 0.0
