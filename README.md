@@ -47,13 +47,15 @@ This repository is maintained across two dedicated branches:
 * **`inputs/`**: Active simulation workspace directory (configured with the hardware MMA accelerator and RiskMLP workload):
   - `sample_mma_mapper.json`: Consolidated single-file specification for instant mapping exploration with integrated Accelergy ERT/ART tables.
   - `sample_mma_model.json`: Consolidated single-file specification for deterministic evaluation with integrated Accelergy ERT/ART tables.
-  - `run_multi_tech_dse.py`: Comprehensive DSE execution script across 5 technology nodes and 4 MLP benchmarks powered 100% by Accelergy.
-  - `components/`: Standard Accelergy compound component templates (`smartbuffer_SRAM.yaml`, `mma_components.yaml`).
+  - `components/`: Standard Accelergy compound component templates (`smartbuffer_SRAM.json`, `mma_components.json`).
   - `cached_tables/`: Baseline Energy and Area Reference Tables (ERT/ART) eliminating legacy PAT estimation.
-  - `architectures/`: Modular hardware architecture definitions (`arch_mma.yaml`).
-  - `constraints/`: Modular spatial and temporal mapping constraints (`constraints_mma.yaml`).
-  - `workloads/`: Tensor shape and problem dimension specifications (`problem_risk_mlp.yaml`, `problem_mnist_mlp.yaml`, `problem_har_mlp.yaml`, `problem_dlrm_mlp.yaml`, `gemm_ABZ.yaml`).
-  - `mapper/`: Search heuristics and convergence criteria (`mapper_mma.yaml`).
+  - `architectures/`: Modular hardware architecture definitions (`arch_mma.json`).
+  - `constraints/`: Modular spatial and temporal mapping constraints (`constraints_mma.json`).
+  - `workloads/`: Tensor shape and problem dimension specifications (`problem_risk_mlp.json`, `problem_mnist_mlp.json`, `problem_har_mlp.json`, `problem_dlrm_mlp.json`, `gemm_ABZ.json`).
+  - `mapper/`: Search heuristics and convergence criteria (`mapper_mma.json`).
+* **`scripts/`**: Design Space Exploration (DSE) automation and analytical plotting suite:
+  - `run_multi_tech_dse.py`: Comprehensive DSE execution script across 5 technology nodes and 4 MLP benchmarks powered 100% by Accelergy.
+  - `run_tree_and_buffer_dse.py`: DSE script exploring optimal adder tree depths and buffer capacities for the MMA accelerator.
 * **`right-out/`**: Multi-technology simulation outputs and analytical plots categorized by process node and neural network workload:
   - `2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`: Subdivided into per-model directories (`risk_mlp/`, `mnist_mlp/`, `har_mlp/`, `dlrm_mlp/`) containing Pareto frontiers, search space distributions, dual-panel power breakdowns, and end-to-end execution plots, plus a `models_comparison/` directory benchmark.
   - `comparison/`: Cross-technology scaling comparison table (`tech_scaling_summary.md`), CSV dump, and comparative benchmark visualizations (`tech_scaling_comparison.png`, `tech_power_breakdown_comparison.png`).
@@ -134,17 +136,18 @@ timeloop-mapper inputs/sample_mma_mapper.json
 ### Multi-Technology DSE and Plot Generation
 ```bash
 source env/setup-env.bash
-python3 inputs/run_multi_tech_dse.py
+python3 scripts/run_multi_tech_dse.py
+python3 scripts/run_tree_and_buffer_dse.py
 ```
 
 ### Modular Multi-File Exploration
 ```bash
 source env/setup-env.bash
 timeloop-mapper \
-    inputs/architectures/arch_mma.yaml \
-    inputs/constraints/constraints_mma.yaml \
-    inputs/workloads/problem_risk_mlp.yaml \
-    inputs/mapper/mapper_mma.yaml
+    inputs/architectures/arch_mma.json \
+    inputs/constraints/constraints_mma.json \
+    inputs/workloads/problem_risk_mlp.json \
+    inputs/mapper/mapper_mma.json
 ```
 
 ### Running Archived Examples

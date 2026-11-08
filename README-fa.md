@@ -19,7 +19,7 @@
   - [قابلیت ۹: مدل‌سازی شتاب‌دهنده‌های لایه‌-فیوز شده (LoopTree: Fused Layers & Tree Mapping)](#قابلیت-۹-مدلسازی-شتابدهندههای-لایه‌-فیوز-شده-looptree-fused-layers--tree-mapping)
   - [قابلیت ۱۰: مدل‌سازی شبکه ارتباطی درون‌تراشه‌ای و چندپخشی (NoC & Multicast)](#قابلیت-۱۰-مدلسازی-شبکه-ارتباطی-درونتراشهای-و-چندپخشی-noc--multicast)
 - [۴. پروژه‌های نمونه عملی و اسکریپت‌های تست‌شده](#۴-پروژه‌های-نمونه-عملی-و-اسکریپت‌های-تست‌شده)
-  - [پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`inputs/mma_gemm_accelerator/`)](#پروژه-۱-شبیه‌سازی-شتاب‌دهنده-سخت‌افزاری-واقعی-mma-و-مدل-riskmlp-به-همراه-dse-inputsmma_gemm_accelerator)
+  - [پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`examples/mma_gemm_accelerator/`)](#پروژه-۱-شبیه‌سازی-شتاب‌دهنده-سخت‌افزاری-واقعی-mma-و-مدل-riskmlp-به-همراه-dse-examplesmma_gemm_accelerator)
   - [پروژه ۲: ارزیابی و کاوش با Accelergy و نگاشت بهینه](#پروژه-۲-ارزیابی-و-کاوش-با-accelergy-و-نگاشت-بهینه)
 - [۵. راهنمای راه‌اندازی و استفاده بر اساس نقش (شاخه‌های `user` و `master`)](#۵-راهنمای-راهاندازی-و-استفاده-بر-اساس-نقش-شاخههای-user-و-master)
   - [۵.۱. راهنمای شاخه `user` (کاربر نهایی - آماده اجرا بدون نیاز به کامپایل)](#۵۱-راهنمای-شاخه-user-کاربر-نهایی---آماده-اجرا-بدون-نیاز-به-کامپایل)
@@ -72,16 +72,22 @@
    * **`tech/180nm/`**: گره ۱۸۰ نانومتر صنعتی میکروکنترلر (GlobalFoundries GF180MCU گوگل).
 
 ### ۲.۳. پوشه فعال ورودی‌ها (`inputs/`)
-پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و با شتاب‌دهنده سخت‌افزاری **MMA (Matrix Multiplication Accelerator)** و ۴ مدل بنچمارک شبکه عصبی پرسپترون چندلایه (RiskMLP، MNIST-MLP، HAR-MLP، DLRM-MLP) پیکربندی شده است:
-* `inputs/architectures/arch_mma.yaml`: تعریف ساختار آرایه بلوک‌تری‌ها (BTs)، بافرهای پینگ‌پنگ IA/W/OA و حافظه اصلی.
-* `inputs/constraints/constraints_mma.yaml`: قیود نگاشت مکانی (K=4 و N) و جریان داده خروجی‌ثابت (Output Stationary).
-* `inputs/workloads/`: تعاریف تانسور و ابعاد مسئله (`problem_risk_mlp.yaml`, `problem_mnist_mlp.yaml`, `problem_har_mlp.yaml`, `problem_dlrm_mlp.yaml`, `gemm_ABZ.yaml`).
-* `inputs/mapper/mapper_mma.yaml`: تنظیمات الگوریتم جستجو، شرایط خاتمه و لاگ‌گیری کاندیداها.
+پوشه `inputs/` فضای کاری فعال شبیه‌سازی است و با شتاب‌دهنده سخت‌افزاری **MMA (Matrix Multiplication Accelerator)** و ۴ مدل بنچمارک شبکه عصبی پرسپترون چندلایه (RiskMLP، MNIST-MLP، HAR-MLP، DLRM-MLP) بر پایه فرمت استاندارد JSON (و پشتیبانی کامل از هر دو فرمت JSON و YAML) پیکربندی شده است:
+* `inputs/architectures/arch_mma.json`: تعریف ساختار آرایه بلوک‌تری‌ها (BTs)، بافرهای پینگ‌پنگ IA/W/OA و حافظه اصلی.
+* `inputs/constraints/constraints_mma.json`: قیود نگاشت مکانی (K=4 و N) و جریان داده خروجی‌ثابت (Output Stationary).
+* `inputs/workloads/`: تعاریف تانسور و ابعاد مسئله (`problem_risk_mlp.json`, `problem_mnist_mlp.json`, `problem_har_mlp.json`, `problem_dlrm_mlp.json`, `gemm_ABZ.json`).
+* `inputs/mapper/mapper_mma.json`: تنظیمات الگوریتم جستجو، شرایط خاتمه و لاگ‌گیری کاندیداها.
+* `inputs/components/`: تعاریف کامپوننت‌های سطح بالای استاندارد Accelergy (`smartbuffer_SRAM.json` و `mma_components.json`).
+* `inputs/cached_tables/`: جداول مرجع پایه انرژی (ERT) و مساحت (ART) مشتق‌شده از Accelergy برای اجرای مستقل و حذف قطعی مدل PAT.
 * `inputs/sample_mma_mapper.json`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
 * `inputs/sample_mma_model.json`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
-* `inputs/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری سیلیکونی و ۴ مدل شبکه عصبی و استخراج نمودارها.
 
-### ۲.۴. پوشه نتایج سازمان‌یافته فناوری‌ها (`right-out/`)
+### ۲.۴. پوشه اسکریپت‌های تحلیلی و DSE (`scripts/`)
+تمامی اسکریپت‌های پایتونی خودکارسازی شبیه‌سازی، کاوش فضای طراحی (DSE) و رسم نمودارهای علمی در پوشه **`scripts/`** مستقر شده‌اند تا پوشه `inputs/` منحصراً برای فایل‌های پیکربندی و توصیف معماری باقی بماند:
+* `scripts/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری سیلیکونی و ۴ مدل شبکه عصبی مبتنی بر ۱۰۰٪ Accelergy و استخراج کلیه نمودارها.
+* `scripts/run_tree_and_buffer_dse.py`: موتور DSE ابعاد عمق درخت جمع‌کننده (Adder Tree Depth) و ظرفیت بافرها (Buffer Capacity) برای شتاب‌دهنده سخت‌افزاری MMA.
+
+### ۲.۵. پوشه نتایج سازمان‌یافته فناوری‌ها (`right-out/`)
 این پوشه نتایج کامل، خروجی‌های شبیه‌سازی، داده‌های آماری CSV و تمامی نمودارهای رسم‌شده را به تفکیک گره‌های فناوری و مدل‌های شبکه عصبی در بر می‌گیرد:
 * `right-out/2nm/`, `7nm/`, `45nm/`, `130nm/`, `180nm/`:
   - `risk_mlp/`: خروجی‌های شبیه‌سازی مدل تخمین ریسک خودرویی RiskMLP.
@@ -91,14 +97,14 @@
   - `models_comparison/`: جدول مقایسه مدل‌ها، نمودارهای مقایسه نرخ فریم (FPS)، مقایسه مصرف توان و انرژی، و گزارش تفصیلی.
 * `right-out/comparison/`: جدول خلاصه مقایسه ۵ فناوری (`tech_scaling_summary.md`)، فایل داده `tech_scaling_comparison.csv` و نمودارهای جامع مقایسه تاخیر، انرژی، TOPS/W، مساحت سیلیکون و تفکیک توان مصرفی درون‌تراشه‌ای و سیستمی.
 
-### ۲.۵. پوشه خروجی‌های شبیه‌سازی جاری (`outputs/`)
+### ۲.۶. پوشه خروجی‌های شبیه‌سازی جاری (`outputs/`)
 تمامی باینری‌های اجرایی به طور پیش‌فرض پیکربندی شده‌اند که کلیه نتایج شبیه‌سازی را مستقیماً در پوشه **`outputs/`** تولید کنند (در صورت عدم وجود پوشه، برنامه به صورت خودکار آن را ایجاد می‌کند):
 * **`outputs/*.stats.txt`**: گزارش متنی تفکیک انرژی و توان اجزا، تعداد چرخه‌ها (Cycles)، و درصد بهره‌وری واحدها (Utilization).
 * **`outputs/*.map.txt`**: نگاشت بهینه پیدا شده (تایلینگ زمانی، مکانی و ترتیب حلقه‌ها).
 * **`outputs/*.map+stats.xml`**: خروجی ساخت‌یافته XML از تمامی آمارها برای پردازش‌های بعدی یا ترسیم پلات.
 * **`outputs/*.log`**: لاگ خط‌به‌خط فرآیند شبیه‌سازی یا پیمایش ماپر.
 
-### ۲.۴. جایگاه و معماری ادغام Accelergy در پروژه
+### ۲.۷. جایگاه و معماری ادغام Accelergy در پروژه
 * **ماهیت Accelergy**: فریم‌ورک متن‌باز مستقل بر پایه پایتون (توسعه‌یافته در دانشگاه MIT) است که برای تخمین سطح معماری انرژی و مساحت شتاب‌دهنده‌ها به کار می‌رود. کد منبع پایتونی Accelergy داخل این مخزن C++ کامپایل نمی‌شود، بلکه به صورت یک ابزار خارجی مستقل فراخوانی می‌گردد.
 * **نقطه اتصال در سورس‌کد C++**:
   * پیاده‌سازی رابط: `src/util/accelergy_interface.cpp`
@@ -174,7 +180,7 @@ mapper:
 ```
 
 #### اسکریپت استخراج لاگ‌ها و تولید نمودارها:
-اسکریپت تخصصی [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/plot_mma_dse.py) تمام لاگ‌ها را پارس کرده و فایل‌های تحلیلی، جبهه پارتو و نمودارهای جامع تفکیک توان را تولید می‌کند.
+اسکریپت تخصصی [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/plot_mma_dse.py) تمام لاگ‌ها را پارس کرده و فایل‌های تحلیلی، جبهه پارتو و نمودارهای جامع تفکیک توان را تولید می‌کند.
 1. `all_evaluated_candidates.csv`: ثبت مشخصات تمام نگاشت‌های موفق در طول سرچ (بهره‌وری، انرژی، ساختار حلقه).
 2. `dse_comprehensive_report.png`: نمودار ۴ قسمتی شامل جبهه پارتو، تفکیک توان، تریدآف بافر و TOPS/W.
 3. `search_space_all_candidates.png`: نمودار پراکندگی (Scatter Plot) کل فضای سرچ.
@@ -298,7 +304,7 @@ timeloop-design-space arch_sweep.yaml problem.yaml
 ```
 
 #### روش ۲: اتوماسیون پایتونی جامع
-اسکریپت [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/run_mma_dse.py) پارامترها را در فایل کانفیگ تغییر داده، ماپر را اجرا کرده، فایل XML را پارس می‌کند و جداول مقایسه‌ای و نمودارها را تولید می‌نماید.
+اسکریپت [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/run_mma_dse.py) پارامترها را در فایل کانفیگ تغییر داده، ماپر را اجرا کرده، فایل XML را پارس می‌کند و جداول مقایسه‌ای و نمودارها را تولید می‌نماید.
 
 ---
 
@@ -395,7 +401,7 @@ LoopTree محاسبه می‌کند که آیا نگه‌داری داده‌ه�
 
 در این مخزن، پروژه‌های عملی و پیکربندی‌های آزموده‌شده برای استفاده مستقیم آماده شده است:
 
-### پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`inputs/mma_gemm_accelerator/`)
+### پروژه ۱: شبیه‌سازی شتاب‌دهنده سخت‌افزاری واقعی MMA و مدل RiskMLP به همراه DSE (`examples/mma_gemm_accelerator/`)
 
 این پروژه مدلسازی دقیق سخت‌افزار واقعی شتاب‌دهنده ماتریسی پروژه بر اساس کد RTL واقعی ([nvdla_matrix_multiplication_4x4.v](file:///D:/UT.CE/MCI/GEMM-accelerator/HW/acc/nvdla_matrix_multiplication_4x4.v) و [matrix_multiplication_accelerator.v](file:///D:/UT.CE/MCI/GEMM-accelerator/HW/mma/matrix_multiplication_accelerator.v)) است:
 
@@ -404,21 +410,21 @@ LoopTree محاسبه می‌کند که آیا نگه‌داری داده‌ه�
   * **رجیسترهای اکومولاتور (`acc_reg`)**: رجیستر ۳۲ بیتی جهت انباشت بدون سرریز ضرب‌های جزئی در جریان داده Output Stationary.
   * **بافرهای پینگ‌پنگ**: بافر ورودی اشتراکی (`IA_BUF`) با برودکست به تمام ستون‌ها، بافر محلی وزن‌ها (`W_BUF`)، بافر محلی خروجی (`OA_BUF`).
   * **ارتباط با حافظه اصلی**: اتصال از طریق Dedicated DMA و گذرگاه اشتراکی ۶۴ بیتی به DRAM.
-  * **تکنولوژی ساخت**: کتابخانه متن‌باز **45nm Nangate Open Cell** مستقر در [inputs/TechFile/45nm/](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/TechFile/45nm).
+  * **تکنولوژی ساخت**: کتابخانه متن‌باز **45nm Nangate Open Cell** مستقر در [tech/45nm/](file:///d:/UT.CE/NNA/04-TimeLoop/repo/tech/45nm).
 * **بار کاری واقعی**: ۳ لایه مدل تخمین ریسک خودروهای خودران (**RiskMLP**):
   * لایه ۱: $M=1, K=16, N=64$
   * لایه ۲: $M=1, K=64, N=64$
   * لایه ۳: $M=1, K=64, N=3$
 * **فایل‌های پیاده‌سازی**:
-  * [arch_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/arch_mma.yaml): معماری سلسله‌مراتبی شتاب‌دهنده.
-  * [constraints_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/constraints_mma.yaml): قیود نگاشت مکانی و جریان داده Output Stationary.
-  * [problem_risk_mlp.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/problem_risk_mlp.yaml): ابعاد لایه‌های RiskMLP.
-  * [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/run_mma_dse.py): موتور DSE پارامتریک برای جاروب بلوک‌تری‌ها، سایز بافرها، فرکانس و لایه‌ها به همراه استخراج **تمام نقاط ساب‌اپتیمال**.
-  * [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator/plot_mma_dse.py): رسم ۴ نمودار پیشرفته تحلیلی (پرتو، فضای جستجو، تفکیک توان، کارایی کل RiskMLP).
+  * [arch_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/arch_mma.yaml): معماری سلسله‌مراتبی شتاب‌دهنده.
+  * [constraints_mma.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/constraints_mma.yaml): قیود نگاشت مکانی و جریان داده Output Stationary.
+  * [problem_risk_mlp.yaml](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/problem_risk_mlp.yaml): ابعاد لایه‌های RiskMLP.
+  * [run_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/run_mma_dse.py): موتور DSE پارامتریک برای جاروب بلوک‌تری‌ها، سایز بافرها، فرکانس و لایه‌ها به همراه استخراج **تمام نقاط ساب‌اپتیمال**.
+  * [plot_mma_dse.py](file:///d:/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator/plot_mma_dse.py): رسم ۴ نمودار پیشرفته تحلیلی (پرتو، فضای جستجو، تفکیک توان، کارایی کل RiskMLP).
 
 #### دستورات اجرا:
 ```bash
-cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo/inputs/mma_gemm_accelerator
+cd /mnt/d/UT.CE/NNA/04-TimeLoop/repo/examples/mma_gemm_accelerator
 
 # ۱. اجرای کامل کاوش فضای طراحی (۶۰ سناریو + ۲۰,۰۸۵ نقطه ساب‌اپتیمال)
 python3 run_mma_dse.py --bts 2 4 8 16 32 --bufs 128 256 512 1024 --freq 500.0

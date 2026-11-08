@@ -58,3 +58,6 @@ docs/
 # Ignore simulation outputs except gitkeep
 outputs/*
 !outputs/.gitkeep
+
+# AI Agent guide
+AGENTS.md

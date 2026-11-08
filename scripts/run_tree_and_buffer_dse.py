@@ -20,7 +20,7 @@ import numpy as np
 import pandas as pd
 
 SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_DIR = SCRIPT_DIR.parent if (SCRIPT_DIR.name == "inputs") else SCRIPT_DIR
+REPO_DIR = SCRIPT_DIR.parent if (SCRIPT_DIR.name in ["inputs", "scripts"]) else SCRIPT_DIR
 TIMELOOP_MAPPER = REPO_DIR / "runner" / "timeloop-mapper"
 RIGHT_OUT_DIR = REPO_DIR / "outputs"
 TECH_BASE_DIR = REPO_DIR / "tech"
