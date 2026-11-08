@@ -27,7 +27,7 @@ import pandas as pd
 SCRIPT_DIR = Path(__file__).resolve().parent
 REPO_DIR = SCRIPT_DIR.parent if (SCRIPT_DIR.name == "inputs") else SCRIPT_DIR.parent.parent
 TIMELOOP_MAPPER = REPO_DIR / "runner" / "timeloop-mapper"
-RIGHT_OUT_DIR = REPO_DIR / "right-out"
+RIGHT_OUT_DIR = REPO_DIR / "outputs"
 TECH_BASE_DIR = REPO_DIR / "tech"
 COMPONENTS_DIR = REPO_DIR / "inputs" / "components"
 
