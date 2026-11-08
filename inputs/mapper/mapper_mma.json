@@ -1,0 +1,17 @@
+{
+  "mapper": {
+    "algorithm": "hybrid",
+    "optimization-metrics": [
+      "energy",
+      "delay"
+    ],
+    "num-threads": 4,
+    "timeout": 1000,
+    "victory-condition": 100,
+    "search-size": 2000,
+    "live-status": false,
+    "log-suboptimal": true,
+    "log-stats": true,
+    "diagnostics": true
+  }
+}

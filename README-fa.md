@@ -77,8 +77,8 @@
 * `inputs/constraints/constraints_mma.yaml`: قیود نگاشت مکانی (K=4 و N) و جریان داده خروجی‌ثابت (Output Stationary).
 * `inputs/workloads/`: تعاریف تانسور و ابعاد مسئله (`problem_risk_mlp.yaml`, `problem_mnist_mlp.yaml`, `problem_har_mlp.yaml`, `problem_dlrm_mlp.yaml`, `gemm_ABZ.yaml`).
 * `inputs/mapper/mapper_mma.yaml`: تنظیمات الگوریتم جستجو، شرایط خاتمه و لاگ‌گیری کاندیداها.
-* `inputs/sample_mma_mapper.yaml`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
-* `inputs/sample_mma_model.yaml`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
+* `inputs/sample_mma_mapper.json`: فایل یکپارچه آماده اجرای کاوش ماپر با یک دستور.
+* `inputs/sample_mma_model.json`: فایل یکپارچه آماده اجرای ارزیابی قطعی مدل با یک دستور.
 * `inputs/run_multi_tech_dse.py`: اسکریپت اجرای شبیه‌سازی جامع در ۵ فناوری سیلیکونی و ۴ مدل شبکه عصبی و استخراج نمودارها.
 
 ### ۲.۴. پوشه نتایج سازمان‌یافته فناوری‌ها (`right-out/`)

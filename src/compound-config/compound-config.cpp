@@ -701,33 +701,33 @@ CompoundConfig::CompoundConfig(const char* inputFile) {
     auto& lroot = LConfig.getRoot();
     useLConfig = true;
     root = CompoundConfigNode(&lroot, YAML::Node(), this);
-  } else if (std::strstr(inputFile, ".yml") || std::strstr(inputFile, ".yaml")) {
+  } else if (std::strstr(inputFile, ".yml") || std::strstr(inputFile, ".yaml") || std::strstr(inputFile, ".json")) {
     std::istringstream combinedStream(contents);
     YConfig = YAML::Load(combinedStream);
     root = CompoundConfigNode(nullptr, YConfig, this);
     useLConfig = false;
     // std::cout << YConfig << std::endl;
   } else {
-    std::cerr << "ERROR: Input configuration file does not end with .cfg, .yml, or .yaml" << std::endl;
+    std::cerr << "ERROR: Input configuration file does not end with .cfg, .yml, .yaml, or .json" << std::endl;
     exit(1);
   }
 }
 
 CompoundConfig::CompoundConfig(std::string input, std::string format) {
-  // we only accept yaml version as a string input
+  // we only accept yaml or json version as a string input
   std::string contents = hyphens2underscores::hyphens2underscores(input);
   if (format.compare("cfg") == 0) {
     LConfig.readString(contents);
     auto& lroot = LConfig.getRoot();
     useLConfig = true;
     root = CompoundConfigNode(&lroot, YAML::Node(), this);
-  } else if (format.compare("yml") == 0 || format.compare("yaml") == 0) {
+  } else if (format.compare("yml") == 0 || format.compare("yaml") == 0 || format.compare("json") == 0) {
     std::istringstream combinedStream(contents);
     YConfig = YAML::Load(combinedStream);
     root = CompoundConfigNode(nullptr, YConfig, this);
     useLConfig = false;
   } else {
-    std::cerr << "ERROR: format should be one of the followings: cfg, yml, yaml." << std::endl;
+    std::cerr << "ERROR: format should be one of the followings: cfg, yml, yaml, json." << std::endl;
     exit(1);
   }
 
@@ -758,14 +758,14 @@ CompoundConfig::CompoundConfig(std::vector<std::string> inputFiles) {
     auto& lroot = LConfig.getRoot();
     useLConfig = true;
     root = CompoundConfigNode(&lroot, YAML::Node(), this);
-  } else if (std::strstr(inputFiles[0].c_str(), ".yml") || std::strstr(inputFiles[0].c_str(), ".yaml")) {
+  } else if (std::strstr(inputFiles[0].c_str(), ".yml") || std::strstr(inputFiles[0].c_str(), ".yaml") || std::strstr(inputFiles[0].c_str(), ".json")) {
     std::istringstream combinedStream(hyphens2underscores::hyphens2underscores(combinedString));
     YConfig = YAML::Load(combinedStream);
     root = CompoundConfigNode(nullptr, YConfig, this);
     useLConfig = false;
     // std::cout << YConfig << std::endl;
   } else {
-    std::cerr << "ERROR: Input configuration file does not end with .cfg, .yml, or .yaml" << std::endl;
+    std::cerr << "ERROR: Input configuration file does not end with .cfg, .yml, .yaml, or .json" << std::endl;
     exit(1);
   }
 

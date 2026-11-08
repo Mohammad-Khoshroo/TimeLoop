@@ -10,6 +10,7 @@ import os
 import sys
 import re
 import glob
+import json
 import yaml
 import shutil
 import subprocess
@@ -131,8 +132,10 @@ def get_or_generate_accelergy_tables(tech_key, bt_count, buf_size, cache_dir):
     
     config_dir = cache_dir / f"{tech_key}_BT{bt_count}_BUF{buf_size}"
     config_dir.mkdir(parents=True, exist_ok=True)
-    ert_file = config_dir / "ERT.yaml"
-    art_file = config_dir / "ART.yaml"
+    ert_file = config_dir / "ERT.json"
+    ert_yaml = config_dir / "ERT.yaml"
+    art_file = config_dir / "ART.json"
+    art_yaml = config_dir / "ART.yaml"
     
     if ert_file.exists() and art_file.exists() and ert_file.stat().st_size > 100:
         return ert_file, art_file
@@ -141,77 +144,130 @@ def get_or_generate_accelergy_tables(tech_key, bt_count, buf_size, cache_dir):
     bt_end_idx = bt_count - 1
     bt_range = f"0..{bt_end_idx}" if bt_end_idx > 0 else "0"
     
-    acc_arch_yaml = f"""architecture:
-  version: 0.4
-  subtree:
-    - name: system
-      attributes:
-        technology: {tech_nm}
-        global_cycle_seconds: {cycle_sec}
-      local:
-        - name: DRAM
-          class: mma_dram
-          attributes:
-            technology: {tech_nm}
-            type: "LPDDR4"
-            width: 64
-            block_size: 16
-            word_bits: 8
-            global_cycle_seconds: {cycle_sec}
-      subtree:
-        - name: MMA_core
-          local:
-            - name: IA_BUF
-              class: smartbuffer_SRAM
-              attributes:
-                technology: {tech_nm}
-                width: 8
-                depth: {buf_size}
-                global_cycle_seconds: {cycle_sec}
-          subtree:
-            - name: BT[{bt_range}]
-              local:
-                - name: W_BUF
-                  class: smartbuffer_SRAM
-                  attributes:
-                    technology: {tech_nm}
-                    width: 8
-                    depth: {buf_size}
-                    global_cycle_seconds: {cycle_sec}
-                - name: OA_BUF
-                  class: smartbuffer_SRAM
-                  attributes:
-                    technology: {tech_nm}
-                    width: 32
-                    depth: {oa_depth}
-                    global_cycle_seconds: {cycle_sec}
-                - name: acc_reg
-                  class: mma_regfile
-                  attributes:
-                    technology: {tech_nm}
-                    width: 32
-                    depth: 1
-                    global_cycle_seconds: {cycle_sec}
-                - name: MACs[0..3]
-                  class: mma_mac
-                  attributes:
-                    technology: {tech_nm}
-                    datawidth: 8
-                    global_cycle_seconds: {cycle_sec}
-"""
-    arch_file = config_dir / "acc_arch.yaml"
-    arch_file.write_text(acc_arch_yaml, encoding="utf-8")
+    acc_arch = {
+        "architecture": {
+            "version": 0.4,
+            "subtree": [
+                {
+                    "name": "system",
+                    "attributes": {
+                        "technology": int(tech_nm),
+                        "global_cycle_seconds": float(cycle_sec)
+                    },
+                    "local": [
+                        {
+                            "name": "DRAM",
+                            "class": "mma_dram",
+                            "attributes": {
+                                "technology": int(tech_nm),
+                                "type": "LPDDR4",
+                                "width": 64,
+                                "block_size": 16,
+                                "word_bits": 8,
+                                "global_cycle_seconds": float(cycle_sec)
+                            }
+                        }
+                    ],
+                    "subtree": [
+                        {
+                            "name": "MMA_core",
+                            "local": [
+                                {
+                                    "name": "IA_BUF",
+                                    "class": "smartbuffer_SRAM",
+                                    "attributes": {
+                                        "technology": int(tech_nm),
+                                        "width": 8,
+                                        "depth": int(buf_size),
+                                        "global_cycle_seconds": float(cycle_sec)
+                                    }
+                                }
+                            ],
+                            "subtree": [
+                                {
+                                    "name": f"BT[{bt_range}]",
+                                    "local": [
+                                        {
+                                            "name": "W_BUF",
+                                            "class": "smartbuffer_SRAM",
+                                            "attributes": {
+                                                "technology": int(tech_nm),
+                                                "width": 8,
+                                                "depth": int(buf_size),
+                                                "global_cycle_seconds": float(cycle_sec)
+                                            }
+                                        },
+                                        {
+                                            "name": "OA_BUF",
+                                            "class": "smartbuffer_SRAM",
+                                            "attributes": {
+                                                "technology": int(tech_nm),
+                                                "width": 32,
+                                                "depth": int(oa_depth),
+                                                "global_cycle_seconds": float(cycle_sec)
+                                            }
+                                        },
+                                        {
+                                            "name": "acc_reg",
+                                            "class": "mma_regfile",
+                                            "attributes": {
+                                                "technology": int(tech_nm),
+                                                "width": 32,
+                                                "depth": 1,
+                                                "global_cycle_seconds": float(cycle_sec)
+                                            }
+                                        },
+                                        {
+                                            "name": "MACs[0..3]",
+                                            "class": "mma_mac",
+                                            "attributes": {
+                                                "technology": int(tech_nm),
+                                                "datawidth": 8,
+                                                "global_cycle_seconds": float(cycle_sec)
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+    arch_file = config_dir / "acc_arch.json"
+    with open(arch_file, "w", encoding="utf-8") as f:
+        json.dump(acc_arch, f, indent=2)
     
     cmd = [
         "accelergy",
         str(arch_file),
-        str(COMPONENTS_DIR / "mma_components.yaml"),
-        str(COMPONENTS_DIR / "smartbuffer_SRAM.yaml"),
+        str(COMPONENTS_DIR / "mma_components.json"),
+        str(COMPONENTS_DIR / "smartbuffer_SRAM.json"),
         "-o", str(config_dir)
     ]
     res = subprocess.run(cmd, capture_output=True, text=True)
     if res.returncode != 0:
         print(f"  [خطای Accelergy برای {tech_key} BT={bt_count} BUF={buf_size}]: {res.stderr}")
+
+    # لایه تبدیل خودکار خروجی‌های Accelergy به JSON
+    if ert_yaml.exists():
+        try:
+            with open(ert_yaml, "r", encoding="utf-8") as f_ert:
+                ert_data = yaml.safe_load(f_ert)
+            with open(config_dir / "ERT.json", "w", encoding="utf-8") as f_out:
+                json.dump(ert_data, f_out, indent=2)
+        except Exception as e:
+            pass
+
+    if art_yaml.exists():
+        try:
+            with open(art_yaml, "r", encoding="utf-8") as f_art:
+                art_data = yaml.safe_load(f_art)
+            with open(config_dir / "ART.json", "w", encoding="utf-8") as f_out:
+                json.dump(art_data, f_out, indent=2)
+        except Exception as e:
+            pass
         
     return ert_file, art_file
 
@@ -316,7 +372,10 @@ def generate_mapping_config(bt_count, buf_size, layer_spec, output_path):
     }
     
     with open(output_path, "w", encoding="utf-8") as f:
-        yaml.dump(config, f, default_flow_style=False)
+        if str(output_path).lower().endswith(".json"):
+            json.dump(config, f, indent=2)
+        else:
+            yaml.dump(config, f, default_flow_style=False)
 
 def parse_stats_file(stats_path, tech_info, layer_spec, bt_count, buf_size):
     """استخراج مستقیم آمارهای ۱۰۰٪ مبتنی بر Accelergy از خروجی تیم‌لوپ"""
@@ -400,7 +459,7 @@ def parse_stats_file(stats_path, tech_info, layer_spec, bt_count, buf_size):
     gops_per_w = (total_ops / 1e9) / (energy_uj * 1e-6) if energy_uj > 0 else 0.0
     tops_per_w = gops_per_w / 1000.0
     
-    return {
+    res_dict = {
         "cycles": cycles,
         "energy_uJ": round(energy_uj, 6),
         "latency_us": round(latency_us, 4),
@@ -415,6 +474,13 @@ def parse_stats_file(stats_path, tech_info, layer_spec, bt_count, buf_size):
         "tops_per_w": round(tops_per_w, 5),
         "area_mm2": round(area_mm2, 6)
     }
+    try:
+        json_path = stats_path.parent / (stats_path.stem + ".json")
+        with open(json_path, "w", encoding="utf-8") as f_json:
+            json.dump(res_dict, f_json, indent=2)
+    except Exception:
+        pass
+    return res_dict
 
 def parse_candidates(log_path, bt_count, buf_size, layer_name, computes, tech_info):
     """استخراج تمام نقاط ساب‌اپتیمال کاوش شده توسط ماپر"""
@@ -902,7 +968,7 @@ def main():
                     for l_name, l_spec in m_info["layers"].items():
                         curr_step += 1
                         tag = f"{tech_key}_{m_key}_BT{bt}_BUF{buf}_{l_name}"
-                        cfg_file = temp_work_dir / f"{tag}.yaml"
+                        cfg_file = temp_work_dir / f"{tag}.json"
                         log_file = temp_work_dir / f"{tag}.log"
                         stats_backup = temp_work_dir / f"{tag}.stats.txt"
                         

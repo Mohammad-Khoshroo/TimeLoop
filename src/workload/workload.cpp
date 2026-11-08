@@ -82,15 +82,15 @@ std::string ShapeFileName(const std::string shape_name)
   shape_dir_list.push_back(std::string(timeloopdir) + "/input");
   shape_dir_list.push_back(std::string(timeloopdir) + "/problem-shapes");
 
-  // Append ".cfg" extension if not provided.
+  // Append ".json" or ".yaml" or ".cfg" extension if not provided.
   std::list<std::string> shape_file_name_list;
-  if (std::strstr(shape_name.c_str(), ".yml") || std::strstr(shape_name.c_str(), ".yaml") || std::strstr(shape_name.c_str(), ".cfg"))
+  if (std::strstr(shape_name.c_str(), ".yml") || std::strstr(shape_name.c_str(), ".yaml") || std::strstr(shape_name.c_str(), ".json") || std::strstr(shape_name.c_str(), ".cfg"))
   {
     shape_file_name_list = { shape_name };
   }
   else
   {
-    shape_file_name_list = { shape_name + ".yaml", shape_name + ".cfg" };
+    shape_file_name_list = { shape_name + ".json", shape_name + ".yaml", shape_name + ".cfg" };
   }
 
   bool found = false;

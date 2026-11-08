@@ -23,7 +23,7 @@ This repository is maintained across two dedicated branches:
      git clone -b user https://github.com/Mohammad-Khoshroo/TimeLoop.git timeloop-user
      cd timeloop-user
      source env/setup-env.bash
-     timeloop-model inputs/sample_mma_model.yaml
+     timeloop-model inputs/sample_mma_model.json
      ```
 
 ---
@@ -45,8 +45,8 @@ This repository is maintained across two dedicated branches:
   - **`simba/`**: NVIDIA Simba multi-chiplet accelerator architecture specification.
   - **`mma_gemm_accelerator/`**: Dedicated MMA hardware accelerator project, RiskMLP neural network layers, and automated DSE suite.
 * **`inputs/`**: Active simulation workspace directory (configured with the hardware MMA accelerator and RiskMLP workload):
-  - `sample_mma_mapper.yaml`: Consolidated single-file specification for instant mapping exploration with integrated Accelergy ERT/ART tables.
-  - `sample_mma_model.yaml`: Consolidated single-file specification for deterministic evaluation with integrated Accelergy ERT/ART tables.
+  - `sample_mma_mapper.json`: Consolidated single-file specification for instant mapping exploration with integrated Accelergy ERT/ART tables.
+  - `sample_mma_model.json`: Consolidated single-file specification for deterministic evaluation with integrated Accelergy ERT/ART tables.
   - `run_multi_tech_dse.py`: Comprehensive DSE execution script across 5 technology nodes and 4 MLP benchmarks powered 100% by Accelergy.
   - `components/`: Standard Accelergy compound component templates (`smartbuffer_SRAM.yaml`, `mma_components.yaml`).
   - `cached_tables/`: Baseline Energy and Area Reference Tables (ERT/ART) eliminating legacy PAT estimation.
@@ -122,13 +122,13 @@ Upon a successful build:
 ### Deterministic Architecture Evaluation (`timeloop-model`)
 ```bash
 source env/setup-env.bash
-timeloop-model inputs/sample_mma_model.yaml
+timeloop-model inputs/sample_mma_model.json
 ```
 
 ### Optimal Mapping Exploration (`timeloop-mapper`)
 ```bash
 source env/setup-env.bash
-timeloop-mapper inputs/sample_mma_mapper.yaml
+timeloop-mapper inputs/sample_mma_mapper.json
 ```
 
 ### Multi-Technology DSE and Plot Generation

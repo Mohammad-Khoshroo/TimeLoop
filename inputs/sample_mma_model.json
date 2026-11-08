@@ -1,0 +1,333 @@
+{
+  "arch": {
+    "arithmetic": {
+      "name": "MACs",
+      "instances": 16,
+      "meshX": 4,
+      "meshY": 4,
+      "word-bits": 8
+    },
+    "storage": [
+      {
+        "name": "acc_reg",
+        "entries": 1,
+        "instances": 4,
+        "meshX": 4,
+        "word-bits": 32
+      },
+      {
+        "name": "OA_BUF",
+        "entries": 64,
+        "instances": 4,
+        "meshX": 4,
+        "word-bits": 32
+      },
+      {
+        "name": "W_BUF",
+        "entries": 256,
+        "instances": 4,
+        "meshX": 4,
+        "word-bits": 8
+      },
+      {
+        "name": "IA_BUF",
+        "entries": 256,
+        "instances": 1,
+        "word-bits": 8
+      },
+      {
+        "name": "DRAM",
+        "technology": "DRAM",
+        "instances": 1,
+        "word-bits": 8,
+        "block-size": 16,
+        "bandwidth": 8.0
+      }
+    ]
+  },
+  "problem": {
+    "shape": "gemm-ABZ",
+    "M": 1,
+    "K": 16,
+    "N": 64
+  },
+  "mapping": [
+    {
+      "target": "acc_reg",
+      "type": "datatype",
+      "keep": [
+        "Z"
+      ],
+      "bypass": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "target": "OA_BUF",
+      "type": "datatype",
+      "keep": [
+        "Z"
+      ],
+      "bypass": [
+        "A",
+        "B"
+      ]
+    },
+    {
+      "target": "W_BUF",
+      "type": "datatype",
+      "keep": [
+        "B"
+      ],
+      "bypass": [
+        "A",
+        "Z"
+      ]
+    },
+    {
+      "target": "IA_BUF",
+      "type": "datatype",
+      "keep": [
+        "A"
+      ],
+      "bypass": [
+        "B",
+        "Z"
+      ]
+    },
+    {
+      "target": "DRAM",
+      "type": "datatype",
+      "keep": [
+        "A",
+        "B",
+        "Z"
+      ],
+      "bypass": []
+    },
+    {
+      "target": "acc_reg",
+      "type": "spatial",
+      "factors": "M1 N1 K4",
+      "permutation": "KMN",
+      "split": 0
+    },
+    {
+      "target": "acc_reg",
+      "type": "temporal",
+      "factors": "M1 N1 K4",
+      "permutation": "KMN"
+    },
+    {
+      "target": "OA_BUF",
+      "type": "temporal",
+      "factors": "M1 N8 K1",
+      "permutation": "NMK"
+    },
+    {
+      "target": "W_BUF",
+      "type": "temporal",
+      "factors": "M1 N2 K1",
+      "permutation": "NMK"
+    },
+    {
+      "target": "IA_BUF",
+      "type": "spatial",
+      "factors": "M1 N4 K1",
+      "permutation": "NMK",
+      "split": 1
+    },
+    {
+      "target": "IA_BUF",
+      "type": "temporal",
+      "factors": "M1 N1 K1",
+      "permutation": "MNK"
+    },
+    {
+      "target": "DRAM",
+      "type": "temporal",
+      "factors": "M1 N1 K1",
+      "permutation": "MNK"
+    }
+  ],
+  "ERT": {
+    "version": "0.4",
+    "tables": [
+      {
+        "name": "system.MMA_core.BT[0..3].W_BUF",
+        "actions": [
+          {
+            "name": "write",
+            "arguments": {},
+            "energy": 0.981103
+          },
+          {
+            "name": "read",
+            "arguments": {},
+            "energy": 0.628772
+          },
+          {
+            "name": "leak",
+            "arguments": {},
+            "energy": 1.7658e-05
+          },
+          {
+            "name": "update",
+            "arguments": {},
+            "energy": 0.981103
+          }
+        ]
+      },
+      {
+        "name": "system.MMA_core.BT[0..3].OA_BUF",
+        "actions": [
+          {
+            "name": "write",
+            "arguments": {},
+            "energy": 1.10514
+          },
+          {
+            "name": "read",
+            "arguments": {},
+            "energy": 0.671565
+          },
+          {
+            "name": "leak",
+            "arguments": {},
+            "energy": 2.33182e-05
+          },
+          {
+            "name": "update",
+            "arguments": {},
+            "energy": 1.10514
+          }
+        ]
+      },
+      {
+        "name": "system.MMA_core.BT[0..3].acc_reg",
+        "actions": [
+          {
+            "name": "write",
+            "arguments": {},
+            "energy": 0.00901
+          },
+          {
+            "name": "read",
+            "arguments": {},
+            "energy": 0.00901
+          },
+          {
+            "name": "update",
+            "arguments": {},
+            "energy": 0.00901
+          },
+          {
+            "name": "leak",
+            "arguments": {},
+            "energy": 0.00015
+          }
+        ]
+      },
+      {
+        "name": "system.MMA_core.BT[0..3].MACs[0..3]",
+        "actions": [
+          {
+            "name": "compute",
+            "arguments": {},
+            "energy": 0.618325
+          },
+          {
+            "name": "mac_random",
+            "arguments": {},
+            "energy": 0.618325
+          },
+          {
+            "name": "leak",
+            "arguments": {},
+            "energy": 0.00745
+          }
+        ]
+      },
+      {
+        "name": "system.MMA_core.IA_BUF",
+        "actions": [
+          {
+            "name": "write",
+            "arguments": {},
+            "energy": 0.981103
+          },
+          {
+            "name": "read",
+            "arguments": {},
+            "energy": 0.628772
+          },
+          {
+            "name": "leak",
+            "arguments": {},
+            "energy": 1.7658e-05
+          },
+          {
+            "name": "update",
+            "arguments": {},
+            "energy": 0.981103
+          }
+        ]
+      },
+      {
+        "name": "system.DRAM",
+        "actions": [
+          {
+            "name": "read",
+            "arguments": {},
+            "energy": 512.0
+          },
+          {
+            "name": "write",
+            "arguments": {},
+            "energy": 512.0
+          },
+          {
+            "name": "update",
+            "arguments": {},
+            "energy": 512.0
+          },
+          {
+            "name": "leak",
+            "arguments": {},
+            "energy": 0.0
+          }
+        ]
+      }
+    ]
+  },
+  "ART": {
+    "version": "0.4",
+    "tables": [
+      {
+        "name": "system.MMA_core.BT[0..3].W_BUF",
+        "area": 857.972
+      },
+      {
+        "name": "system.MMA_core.BT[0..3].OA_BUF",
+        "area": 1055.36
+      },
+      {
+        "name": "system.MMA_core.BT[0..3].acc_reg",
+        "area": 5.98
+      },
+      {
+        "name": "system.MMA_core.BT[0..3].MACs[0..3]",
+        "area": 366.0
+      },
+      {
+        "name": "system.MMA_core.IA_BUF",
+        "area": 857.972
+      },
+      {
+        "name": "system.DRAM",
+        "area": 0.0
+      }
+    ]
+  }
+}
